@@ -1,6 +1,7 @@
 # K-Table
 서울여자대학교 구루2 안드로이드 K-Table 레포지토리
 
+<br>
 
 ## Git Branch Strategy
 - `main`: 배포 가능하도록 관리 브랜치
