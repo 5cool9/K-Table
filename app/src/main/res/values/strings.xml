@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">K-Table</string>
+
+    <string name="default_web_client_id">
+        여기에_client_type_3의_client_id.apps.googleusercontent.com
+    </string>
 </resources>

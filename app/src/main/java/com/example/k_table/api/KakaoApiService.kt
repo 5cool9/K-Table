@@ -1,0 +1,27 @@
+package com.example.k_table.api
+
+import com.example.k_table.model.KakaoResponse
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Query
+
+interface KakaoApiService {
+
+    @GET("v2/local/search/category.json")
+    suspend fun searchRestaurant(
+        @Header("Authorization") key: String,
+
+        @Query("category_group_code")
+        category: String = "FD6",
+
+        @Query("x")
+        longitude: String,
+
+        @Query("y")
+        latitude: String,
+
+        @Query("radius")
+        radius: Int = 2000
+
+    ): retrofit2.Response<KakaoResponse>
+}
