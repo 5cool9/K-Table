@@ -1,23 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- AI에게 맛집 검색을 요청하는 버튼 -->
-    <Button
-        android:id="@+id/btnSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="서울여대 근처 비건 식당 20곳 AI로 가져오기" />
 
-    <!-- 맛집 리스트가 꽂힐 고정 UI 뷰 (리사이클러뷰) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
+    <!-- 화면 내용 영역 -->
+    <androidx.fragment.app.FragmentContainerView
+
+        android:id="@+id/fragmentContainer"
+
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="16dp" />
 
-</LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+
+    <!-- 하단 탭바 -->
+    <LinearLayout
+
+        android:id="@+id/bottomBar"
+
+        android:layout_width="0dp"
+        android:layout_height="63dp"
+
+        android:background="@drawable/bg_bottom_bar"
+
+        android:orientation="horizontal"
+
+        android:gravity="center_vertical"
+
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+
+
+
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+
+        android:layout_marginBottom="20dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <ImageButton
+
+            android:id="@+id/homeTab"
+
+            android:layout_width="0dp"
+
+            android:layout_height="24dp"
+
+            android:layout_weight="1"
+
+            android:background="@android:color/transparent"
+
+            android:scaleType="fitCenter"
+
+            android:padding="0dp"
+
+            android:src="@drawable/home_icon"/>
+
+
+
+        <ImageButton
+
+            android:id="@+id/scanTab"
+
+            android:layout_width="0dp"
+
+            android:layout_height="50dp"
+
+            android:layout_weight="1"
+
+            android:background="@android:color/transparent"
+
+            android:scaleType="fitCenter"
+
+            android:padding="0dp"
+
+            android:src="@drawable/camera_icon"/>
+
+
+
+        <ImageButton
+
+            android:id="@+id/myPageTab"
+
+            android:layout_width="0dp"
+
+            android:layout_height="24dp"
+
+            android:layout_weight="1"
+
+            android:background="@android:color/transparent"
+
+            android:scaleType="fitCenter"
+
+            android:padding="0dp"
+
+            android:src="@drawable/person_icon"/>
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

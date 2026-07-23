@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="16dp">
+
+<!-- AI에게 맛집 검색을 요청하는 버튼 -->
+<Button
+    android:id="@+id/btnSearch"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="서울여대 근처 비건 식당 20곳 AI로 가져오기" />
+
+<!-- 맛집 리스트가 꽂힐 고정 UI 뷰 -->
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/recyclerView"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_marginTop="16dp" />
+
+</LinearLayout>

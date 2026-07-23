@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.k_table.model.Restaurant
 
 class RestaurantAdapter(private val items: List<Restaurant>) :
     RecyclerView.Adapter<RestaurantAdapter.ViewHolder>() {
@@ -17,7 +18,7 @@ class RestaurantAdapter(private val items: List<Restaurant>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // 사용자가 미리 만들어둔 고정 UI XML 파일 이름 (예: item_restaurant.xml)
+
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_restaurant, parent, false)
         return ViewHolder(view)
