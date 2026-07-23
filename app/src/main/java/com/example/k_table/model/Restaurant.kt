@@ -1,4 +1,4 @@
-package com.example.k_table
+package com.example.k_table.model
 
 data class Restaurant(
     val name: String,

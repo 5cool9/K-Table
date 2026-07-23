@@ -1,18 +1,14 @@
 package com.example.k_table.api
 
-
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-
 object GeminiRetrofitClient {
-
 
     private const val BASE_URL =
         "https://generativelanguage.googleapis.com/"
-
 
     private val client =
         OkHttpClient.Builder()
@@ -35,9 +31,7 @@ object GeminiRetrofitClient {
             .build()
 
 
-
     val api: GeminiApiService by lazy {
-
 
         Retrofit.Builder()
 
@@ -54,7 +48,6 @@ object GeminiRetrofitClient {
             .create(
                 GeminiApiService::class.java
             )
-
 
     }
 

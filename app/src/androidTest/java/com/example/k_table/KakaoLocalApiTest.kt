@@ -99,6 +99,6 @@ class KakaoLocalApiTest {
 
         // 카카오 디벨로퍼스의 REST API 키만 입력
         private const val KAKAO_REST_API_KEY =
-            "59683a2ff759c47f799cc7c988b1d278"
+            BuildConfig.KAKAO_REST_API_KEY
     }
 }
