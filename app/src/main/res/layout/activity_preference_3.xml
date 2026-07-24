@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <!-- 상단 바 -->
+    <LinearLayout
+        android:id="@+id/layoutTopBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="8dp"
+            android:layout_height="14dp"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signup_step_3"
+            android:textColor="#1B1C1E"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+
+    <!-- 타이틀 및 설명 -->
+    <LinearLayout
+        android:id="@+id/layoutTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutTopBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tell_us_about_you"
+            android:textColor="#2D2F34"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/personalize_subtitle"
+            android:textColor="#7A7A7A"
+            android:textSize="16sp"
+            android:layout_marginTop="15dp" />
+    </LinearLayout>
+
+    <!-- 선택지 카드 그리드 영역 -->
+    <GridLayout
+        android:id="@+id/gridPreferences"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:alignmentMode="alignMargins"
+        android:columnOrderPreserved="false"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Halal -->
+        <TextView
+            android:id="@+id/btnHalal"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_halal"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+
+        <!-- Vegetarian -->
+        <TextView
+            android:id="@+id/btnVegetarian"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_vegetarian"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Vegan -->
+        <TextView
+            android:id="@+id/btnVegan"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_vegan"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- MSG Free -->
+        <TextView
+            android:id="@+id/btnMsgFree"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_msg_free"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Gluten Free -->
+        <TextView
+            android:id="@+id/btnGlutenFree"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_gluten_free"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Pork Free -->
+        <TextView
+            android:id="@+id/btnPorkFree"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_pork_free"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Alcohol Free -->
+        <TextView
+            android:id="@+id/btnAlcoholFree"
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_selectable_card"
+            android:gravity="center"
+            android:text="@string/pref_alcohol_free"
+            android:textColor="#5B5A5A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </GridLayout>
+
+    <!-- None 버튼  -->
+    <TextView
+        android:id="@+id/btnNone"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_selectable_card"
+        android:gravity="center"
+        android:text="@string/pref_none"
+        android:textColor="#028334"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toBottomOf="@id/gridPreferences"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 안내 문구 -->
+    <TextView
+        android:id="@+id/tvUpdateNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/update_anytime"
+        android:textColor="#7A7A7A"
+        android:textSize="15sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/btnNone"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 하단 Next 버튼 -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_green_button"
+        android:text="@string/btn_next"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="24dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
