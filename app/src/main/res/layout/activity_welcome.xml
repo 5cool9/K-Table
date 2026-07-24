@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnGetStarted"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 사용자가 설정한 닉네임이 들어갈 텍스트뷰 -->
+        <TextView
+            android:id="@+id/tvNickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#028334"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:text="USER" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_message"
+            android:textColor="#342D2D"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- 서브 안내 텍스트 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_subtitle"
+            android:textColor="#7A7A7A"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+
+    <!-- 하단 Get Started 버튼 -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnGetStarted"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="@drawable/bg_green_button"
+        android:text="@string/btn_get_started"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="36dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

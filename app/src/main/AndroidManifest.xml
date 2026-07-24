@@ -32,6 +32,22 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".Preference2Activity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Preference3Activity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Preference4Activity"
+            android:exported="false" />
+
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

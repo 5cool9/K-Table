@@ -40,10 +40,10 @@
             android:id="@+id/btnEmailLogin"
             android:layout_width="match_parent"
             android:layout_height="51dp"
-            android:background="@drawable/bg_green_button"
+            android:background="@drawable/bg_login_button"
             android:text="Continue with Email"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textAllCaps="false" />
 
