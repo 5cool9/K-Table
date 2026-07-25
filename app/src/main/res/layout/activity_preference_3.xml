@@ -232,7 +232,7 @@
         android:background="@drawable/bg_green_button"
         android:text="@string/btn_next"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"

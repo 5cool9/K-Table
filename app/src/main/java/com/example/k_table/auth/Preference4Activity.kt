@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Preference4Activity : AppCompatActivity() {
 
@@ -17,27 +18,15 @@ class Preference4Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference_4)
 
-        // 뒤로 가기
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack.setOnClickListener { finish() }
 
-        // 요소 연결
         val cardOther = findViewById<LinearLayout>(R.id.cardOther)
-        val gridOtherAllergy = findViewById<GridLayout>(R.id.gridOtherAllergy)
         val btnNone = findViewById<TextView>(R.id.btnNone)
         val btnComplete = findViewById<AppCompatButton>(R.id.btnComplete)
 
-        // 모든 알레르기 카드들에 선택(토글) 및 확장 효과 적용하기
-        val allCards = listOf(
-            findViewById<LinearLayout>(R.id.cardPeanuts),
-            findViewById<LinearLayout>(R.id.cardTreeNuts),
-            findViewById<LinearLayout>(R.id.cardMilk),
-            findViewById<LinearLayout>(R.id.cardEggs),
-            findViewById<LinearLayout>(R.id.cardSeafood),
-            findViewById<LinearLayout>(R.id.cardWheat),
-            findViewById<LinearLayout>(R.id.cardSoy),
-            findViewById<LinearLayout>(R.id.cardSesame),
-            cardOther,
+        // 세부 알레르기 카드 목록
+        val detailedCards = listOf(
             findViewById<LinearLayout>(R.id.cardCorn),
             findViewById<LinearLayout>(R.id.cardChicken),
             findViewById<LinearLayout>(R.id.cardBeef),
@@ -53,34 +42,155 @@ class Preference4Activity : AppCompatActivity() {
             findViewById<LinearLayout>(R.id.cardSpices)
         )
 
-        for (card in allCards) {
-            card.setOnClickListener {
-                if (card.id == R.id.cardOther) {
-                    // 1. Other 버튼 자체를 화면에서 숨김 처리
-                    card.visibility = View.GONE
-
-                    // 2. 숨겨져 있던 세부 알레르기 그리드를 나타냄
-                    gridOtherAllergy.visibility = View.VISIBLE
-                } else {
-                    card.isSelected = !card.isSelected
-                }
-            }
+        // 앱이 처음 켜졌을 때 세부 카드들은 숨겨두기
+        for (detailCard in detailedCards) {
+            detailCard.visibility = View.GONE
         }
 
-        // None 버튼 토글 효과
-        btnNone.setOnClickListener {
-            btnNone.isSelected = !btnNone.isSelected
+        // 기본 카드 목록
+        val defaultCards = listOf(
+            findViewById<LinearLayout>(R.id.cardPeanuts),
+            findViewById<LinearLayout>(R.id.cardTreeNuts),
+            findViewById<LinearLayout>(R.id.cardMilk),
+            findViewById<LinearLayout>(R.id.cardEggs),
+            findViewById<LinearLayout>(R.id.cardSeafood),
+            findViewById<LinearLayout>(R.id.cardWheat),
+            findViewById<LinearLayout>(R.id.cardSoy),
+            findViewById<LinearLayout>(R.id.cardSesame)
+        )
+
+        val allAllergyCards = defaultCards + detailedCards
+
+        fun updateState() {
+            val isAnyAllergySelected = allAllergyCards.any { it.isSelected }
+            val isNoneSelected = btnNone.isSelected
+
+            btnComplete.isEnabled = isAnyAllergySelected || isNoneSelected
+
+            // None 버튼 텍스트 색상 처리
             btnNone.setTextColor(if (btnNone.isSelected) Color.WHITE else Color.parseColor("#008000"))
         }
 
-        // 버튼 클릭 시 환영 페이지로 이동
+        // 초기 진입 시 버튼 비활성화 상태 맞추기
+        updateState()
+
+        // 기본 카드들 클릭 리스너
+        for (card in defaultCards) {
+            card.setOnClickListener {
+                // 알레르기 카드를 누르면 None은 무조건 선택 해제
+                btnNone.isSelected = false
+                card.isSelected = !card.isSelected
+                updateState()
+            }
+        }
+
+        // 세부 카드들 클릭 리스너
+        for (card in detailedCards) {
+            card.setOnClickListener {
+                // 세부 카드를 누르면 None은 무조건 선택 해제
+                btnNone.isSelected = false
+                card.isSelected = !card.isSelected
+                updateState()
+            }
+        }
+
+        // Other 버튼 클릭 리스너
+        cardOther.setOnClickListener {
+            val gridDefaultAllergy = findViewById<GridLayout>(R.id.gridDefaultAllergy)
+
+            gridDefaultAllergy.removeView(cardOther)
+
+            for (detailCard in detailedCards) {
+                gridDefaultAllergy.removeView(detailCard)
+            }
+
+            for (detailCard in detailedCards) {
+                detailCard.visibility = View.VISIBLE
+                gridDefaultAllergy.addView(detailCard)
+            }
+        }
+
+
+        btnNone.setOnClickListener {
+
+            for (card in allAllergyCards) {
+                card.isSelected = false
+            }
+
+            btnNone.isSelected = !btnNone.isSelected
+            updateState()
+        }
+
+        // 완료 버튼
         btnComplete.setOnClickListener {
             val userNickname = intent.getStringExtra("USER_NICKNAME") ?: "USER"
+            val userLanguage = intent.getStringExtra("USER_LANGUAGE") ?: "Korean"
+            val userPreferences = intent.getStringArrayListExtra("USER_PREFERENCES") ?: arrayListOf()
 
-            val intent = Intent(this, WelcomeActivity::class.java).apply {
-                putExtra("USER_NICKNAME", userNickname)
+            val selectedAllergies = mutableListOf<String>()
+
+            val allergyKeyMap = mapOf(
+                R.id.cardPeanuts to "PEANUTS",
+                R.id.cardTreeNuts to "TREE_NUTS",
+                R.id.cardMilk to "MILK",
+                R.id.cardEggs to "EGGS",
+                R.id.cardSeafood to "SEAFOOD",
+                R.id.cardWheat to "WHEAT",
+                R.id.cardSoy to "SOY",
+                R.id.cardSesame to "SESAME",
+                R.id.cardCorn to "CORN",
+                R.id.cardChicken to "CHICKEN",
+                R.id.cardBeef to "BEEF",
+                R.id.cardPork to "PORK",
+                R.id.cardTomato to "TOMATO",
+                R.id.cardMushroom to "MUSHROOM",
+                R.id.cardCoconut to "COCONUT",
+                R.id.cardKiwi to "KIWI",
+                R.id.cardPeach to "PEACH",
+                R.id.cardBanana to "BANANA",
+                R.id.cardGarlic to "GARLIC",
+                R.id.cardOnion to "ONION",
+                R.id.cardSpices to "SPICES"
+            )
+
+            for (card in allAllergyCards) {
+                if (card.isSelected) {
+                    // ID에 매칭되는 고유 키값을 가져와서 리스트에 추가
+                    allergyKeyMap[card.id]?.let { key ->
+                        selectedAllergies.add(key)
+                    }
+                }
             }
-            startActivity(intent)
+
+            if (btnNone.isSelected) {
+                selectedAllergies.add("NONE")
+            }
+
+            val userInfo = UserPreference(
+                nickname = userNickname,
+                language = userLanguage,
+                preferences = userPreferences,
+                allergies = selectedAllergies
+            )
+
+            val currentUserUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: userNickname
+
+            val db = FirebaseFirestore.getInstance()
+            db.collection("users").document(currentUserUid)
+                .set(userInfo)
+                .addOnSuccessListener {
+                    // 저장 성공 시 홈 화면으로 이동
+                    val nextIntent = Intent(this, WelcomeActivity::class.java).apply {
+                        putExtra("USER_NICKNAME", userNickname)
+                    }
+                    startActivity(nextIntent)
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    // 실패 시 처리
+                }
+
+
         }
     }
 }
