@@ -39,7 +39,7 @@
                 android:text="@string/signup_step_4"
                 android:textColor="#1B1C1E"
                 android:textSize="17sp"
-                android:textStyle="normal"
+                android:textStyle="bold"
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
@@ -71,7 +71,7 @@
                 android:layout_marginTop="15dp" />
         </LinearLayout>
 
-        <!-- 기본 알레르기 목록 -->
+        <!-- 모든 알레르기 목록 -->
         <GridLayout
             android:id="@+id/gridDefaultAllergy"
             android:layout_width="0dp"
@@ -82,8 +82,10 @@
             android:layout_marginTop="24dp"
             app:layout_constraintTop_toBottomOf="@id/layoutTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            android:rowOrderPreserved="false">
 
+            <!-- 기본 알레르기 8개 -->
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardPeanuts"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_peanuts" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_peanuts" /></LinearLayout>
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardTreeNuts"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_treenuts" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_tree_nuts" /></LinearLayout>
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardMilk"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_milk" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_milk" /></LinearLayout>
@@ -93,37 +95,22 @@
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardSoy"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_soy" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_soy" /></LinearLayout>
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardSesame"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_sesame" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_sesame" /></LinearLayout>
 
-            <!-- Other 버튼 -->
             <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardOther"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_other" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_other" /></LinearLayout>
-        </GridLayout>
+            <!-- 세부 알레르기 카드들 (처음엔 전부 숨김 처리) -->
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardCorn" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_corn" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_corn" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardChicken" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_chicken" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_chicken" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardBeef" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_beef" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_beef" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardPork" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_pork" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_pork" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardTomato" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_tomato" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_tomato" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardMushroom" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_mushroom" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_mushroom" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardCoconut" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_coconut" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_coconut" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardKiwi" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_kiwi" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_kiwi" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardPeach" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_peach" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_peach" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardBanana" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_banana" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_banana" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardGarlic" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_garlic" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_garlic" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardOnion" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_onion" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_onion" /></LinearLayout>
+            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardSpices" android:visibility="gone"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_spices" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_spices" /></LinearLayout>
 
-        <!-- Other를 눌렀을 때 아래에 확장 -->
-        <GridLayout
-            android:id="@+id/gridOtherAllergy"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:alignmentMode="alignMargins"
-            android:columnOrderPreserved="false"
-            android:layout_marginTop="12dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/gridDefaultAllergy"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardCorn"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_corn" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_corn" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardChicken"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_chicken" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_chicken" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardBeef"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_beef" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_beef" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardPork"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_pork" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_pork" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardTomato"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_tomato" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_tomato" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardMushroom"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_mushroom" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_mushroom" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardCoconut"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_coconut" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_coconut" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardKiwi"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_kiwi" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_kiwi" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardPeach"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_peach" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_peach" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardBanana"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_banana" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_banana" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardGarlic"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_garlic" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_garlic" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardOnion"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_onion" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_onion" /></LinearLayout>
-            <LinearLayout style="@style/AllergyCardStyle" android:id="@+id/cardSpices"><ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_spices" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textSize="14sp" android:textColor="#5B5A5A" android:textStyle="bold" android:text="@string/allergy_spices" /></LinearLayout>
         </GridLayout>
 
         <!-- None 버튼 -->
@@ -140,7 +127,7 @@
             android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            app:layout_constraintTop_toBottomOf="@id/gridOtherAllergy"
+            app:layout_constraintTop_toBottomOf="@id/gridDefaultAllergy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -164,7 +151,7 @@
             android:background="@drawable/bg_green_button"
             android:text="@string/btn_complete"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textAllCaps="false"
             android:layout_marginTop="24dp"
