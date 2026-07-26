@@ -10,5 +10,5 @@ data class KakaoPlace(
     val road_address_name: String,
     val address_name: String,
     val phone: String,
-    val distance: String
+    val distance: String,
 )

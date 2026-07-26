@@ -26,8 +26,8 @@
         android:layout_height="wrap_content"
         android:text="Personalized"
         android:textStyle="bold"
-        android:textSize="24sp"
-        android:textColor="#0A8F3D"
+        android:textSize="35sp"
+        android:textColor="#028334"
         android:layout_marginStart="30dp"
         android:layout_marginTop="100dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,8 +40,8 @@
         android:layout_height="wrap_content"
         android:text="Recommendations"
         android:textStyle="bold"
-        android:textSize="24sp"
-        android:textColor="#222222"
+        android:textSize="35sp"
+        android:textColor="#2D2F34"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtGreen"/>
 
@@ -51,14 +51,12 @@
         android:layout_width="290dp"
         android:layout_height="wrap_content"
         android:text="Get tailored food and restaurant recommendations that fit your diet and preferences."
-        android:textColor="#777777"
-        android:textSize="16sp"
+        android:textColor="#7A7A7A"
+        android:textSize="20sp"
         android:layout_marginTop="18dp"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtBlack"/>
 
-    <!-- 음식 사진 -->
-    <!-- Next 버튼 -->
 
     <ImageView
         android:id="@+id/imgFood"
@@ -66,8 +64,7 @@
         android:layout_height="420dp"
         android:layout_marginTop="84dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/Onboarding_food"
-
+        android:src="@drawable/onboarding_food"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,9 +78,7 @@
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
         android:backgroundTint="#0A8F3D"
-
         android:translationY="-35dp"
-
         app:cornerRadius="28dp"
         app:layout_constraintBottom_toTopOf="@id/layoutDots"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,19 +99,18 @@
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:layout_margin="4dp"
-            android:background="@drawable/dot_inactive"/>
+            />
 
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:layout_margin="4dp"
-            android:background="@drawable/dot_active"/>
+            />
 
         <View
             android:layout_width="8dp"
             android:layout_height="8dp"
-            android:layout_margin="4dp"
-            android:background="@drawable/dot_inactive"/>
+            android:layout_margin="4dp" />
 
     </LinearLayout>
 

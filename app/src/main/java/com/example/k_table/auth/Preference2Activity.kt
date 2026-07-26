@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.widget.doAfterTextChanged // 🌟 이 라이브러리가 필요합니다!
+import androidx.core.widget.doAfterTextChanged
 
 class Preference2Activity : AppCompatActivity() {
 
