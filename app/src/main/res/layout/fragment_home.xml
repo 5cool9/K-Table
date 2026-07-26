@@ -1,23 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:orientation="vertical"
-android:padding="16dp">
-
-<!-- AI에게 맛집 검색을 요청하는 버튼 -->
-<Button
-    android:id="@+id/btnSearch"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="서울여대 근처 비건 식당 20곳 AI로 가져오기" />
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-<!-- 맛집 리스트가 꽂힐 고정 UI 뷰 -->
-<androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/recyclerView"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:layout_marginTop="16dp" />
+    <!-- 스크롤 가능한 본문 영역 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 상단 로고 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="30dp"
+                android:paddingStart="24dp">
+
+                <ImageView
+                    android:layout_width="79dp"
+                    android:layout_height="31dp"
+                    android:scaleType="fitStart"
+                    android:src="@drawable/home_logo" />
+            </LinearLayout>
+
+            <!-- 검색창 및 위치 버튼 레이아웃 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp">
+
+                <!-- 검색창 -->
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_edittext"
+                    android:hint="메뉴를 검색해보세요 !"
+                    android:paddingHorizontal="16dp"
+                    android:textColorHint="#BBBBBB"
+                    android:textColor="#111111"
+                    android:textSize="13sp"
+                    android:drawableStart="@drawable/ic_menu_search"
+                    android:drawablePadding="8dp"/>
+
+                <!-- 위치 버튼 -->
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/rounded_button"
+                    android:drawableStart="@drawable/ic_menu_mylocation"
+                    android:paddingHorizontal="12dp"
+                    android:text="위치"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 오늘의 추천 식당 타이틀 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="오늘의 추천 식당"
+                android:textColor="#342D2D"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="24dp"/>
+
+            <!-- 오늘의 추천 식당 가로 슬라이드 -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerToday"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="12dp" />
+
+            <!-- 프로모션 배너 -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/banner_sample" />
+
+            <!-- 맞춤 추천 타이틀 -->
+            <TextView
+                android:id="@+id/tvUserRecommendTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="오늘은 여기 어떠신가요?"
+                android:textColor="#342D2D"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingStart="24dp" />
+
+            <!-- 식당 리스트 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRestaurantList"
+                android:layout_width="match_parent"
+                android:layout_height="1000dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="80dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

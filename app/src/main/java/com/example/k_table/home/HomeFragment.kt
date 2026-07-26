@@ -4,8 +4,8 @@ import com.example.k_table.BuildConfig
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,55 +26,142 @@ import com.example.k_table.model.GeminiResponse
 import com.example.k_table.model.Restaurant
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
+// Firestore에서 불러온 사용자 식단 프로필
+data class UserDietProfile(
+    val allergies: List<String>,
+    val preferences: List<String>
+)
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    // 화면에 추천 식당 목록을 표시하기 위한 RecyclerView 관련 변수
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RestaurantAdapter
-    // 현재 추천된 식당 데이터를 저장하는 리스트
     private val restaurantList = mutableListOf<Restaurant>()
-    // 사용자 현재 위치 정보를 가져오기 위한 클라이언트
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    // 한번 불러온 프로필은 재사용 (버튼 다시 눌러도 Firestore 재조회 안 하도록)
+    private var cachedUserProfile: UserDietProfile? = null
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-
-        // 사용자 위치 조회 객체 초기화
-        fusedLocationClient =
-            LocationServices.getFusedLocationProviderClient(
-                requireContext()
-            )
-
-        // RecyclerView 초기 설정
-        recyclerView =
-            view.findViewById(R.id.recyclerView)
-
-        recyclerView.layoutManager =
-            LinearLayoutManager(requireContext())
-
-        adapter = RestaurantAdapter(restaurantList)
-
-        recyclerView.adapter = adapter
-
-        val btnSearch: Button =
-            view.findViewById(R.id.btnSearch)
-
-        btnSearch.setOnClickListener {
-
-            Toast.makeText(
-                requireContext(),
-                "식당 검색 시작",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            fetchRestaurantsFromKakao()
-
+    // 위치 권한 요청 런처 - 반드시 Fragment 필드로 등록 (onViewCreated 안 X)
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                fetchCurrentLocationAndSearch()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "위치 권한이 거부되어 기본 위치로 검색합니다.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                startSearch("37.5665", "126.9780")
+            }
         }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
+
+        recyclerView = view.findViewById(R.id.rvRestaurantList)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = RestaurantAdapter(restaurantList)
+        recyclerView.adapter = adapter
+
+        val btnLocation = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLocation)
+        btnLocation.setOnClickListener {
+            requestLocationPermissionAndSearch()
+        }
+
+        // 홈 화면 진입 시 서울 기본 좌표로 자동 추천 시작
+        startSearch("37.5665", "126.9780")
+    }
+
+    // 위치 버튼 클릭 시 권한 체크 후 분기
+    private fun requestLocationPermissionAndSearch() {
+        val hasPermission = requireContext().checkSelfPermission(
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            fetchCurrentLocationAndSearch()
+        } else {
+            locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    // 실제 현재 위치를 가져와서 검색
+    private fun fetchCurrentLocationAndSearch() {
+
+        val hasPermission = requireContext().checkSelfPermission(
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (!hasPermission) {
+            Log.d("LOCATION", "권한 없음 → 기본 위치 사용")
+            startSearch("37.5665", "126.9780")
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null
+                && location.latitude in 33.0..39.0
+                && location.longitude in 124.0..132.0
+            ) {
+                Log.d("LOCATION", "사용자 위치 사용 : ${location.latitude} / ${location.longitude}")
+                startSearch(location.latitude.toString(), location.longitude.toString())
+            } else {
+                Log.d("LOCATION", "비정상 위치 → 서울 기본 위치 사용")
+                Toast.makeText(requireContext(), "현재 위치를 확인할 수 없어 기본 위치로 검색합니다.", Toast.LENGTH_SHORT).show()
+                startSearch("37.5665", "126.9780")
+            }
+        }
+    }
+
+    // 프로필이 캐시되어 있으면 바로, 없으면 Firestore에서 불러온 뒤 검색 시작
+    private fun startSearch(latitude: String, longitude: String) {
+        val profile = cachedUserProfile
+        if (profile != null) {
+            requestRestaurantSearch(latitude, longitude, profile)
+        } else {
+            fetchUserProfileFromFirestore { fetchedProfile ->
+                cachedUserProfile = fetchedProfile
+                requestRestaurantSearch(latitude, longitude, fetchedProfile)
+            }
+        }
+    }
+
+    // Firestore에서 사용자 알레르기/식단 정보 불러오기
+    private fun fetchUserProfileFromFirestore(onResult: (UserDietProfile) -> Unit) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (uid == null) {
+            Log.d("FIRESTORE", "로그인 정보 없음 → 기본 프로필 사용")
+            onResult(UserDietProfile(emptyList(), emptyList()))
+            return
+        }
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                @Suppress("UNCHECKED_CAST")
+                val allergies = doc.get("allergies") as? List<String> ?: emptyList()
+
+                @Suppress("UNCHECKED_CAST")
+                val preferences = doc.get("preferences") as? List<String> ?: emptyList()
+
+                Log.d("FIRESTORE", "프로필 로드 완료 : allergies=$allergies, preferences=$preferences")
+
+                onResult(UserDietProfile(allergies, preferences))
+            }
+            .addOnFailureListener { e ->
+                Log.e("FIRESTORE_ERROR", e.toString())
+                onResult(UserDietProfile(emptyList(), emptyList()))
+            }
     }
 
     // Gemini API 서버 오류 발생 시 일정 시간 후 재시도 처리
@@ -83,7 +170,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     ): retrofit2.Response<GeminiResponse> {
 
         repeat(3) { attempt ->
-
             val response = apiCall()
 
             if (response.isSuccessful) {
@@ -91,12 +177,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
 
             if (response.code() == 503) {
-
-                Log.d(
-                    "GEMINI_RETRY",
-                    "${attempt + 1}번째 재시도"
-                )
-
+                Log.d("GEMINI_RETRY", "${attempt + 1}번째 재시도")
                 kotlinx.coroutines.delay(3000)
             } else {
                 return response
@@ -106,127 +187,65 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         throw Exception("Gemini 서버 응답 실패")
     }
 
-    // 현재 사용자 위치 기반 카카오 API에서 주변 식당 검색
-    // 현재 위치 기반 카카오 API에서 주변 식당 검색
-    private fun fetchRestaurantsFromKakao() {
-
-
-        // 기본 위치 (서울 시청)
-        var latitude = "37.5665"
-        var longitude = "126.9780"
-
-        // 위치 권한 확인
-        val hasPermission =
-            requireContext().checkSelfPermission(
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-
-
-        if (hasPermission) {
-
-            // 현재 위치 가져오기
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
-
-
-                    if (location != null
-                        && location.latitude in 33.0..39.0
-                        && location.longitude in 124.0..132.0
-                    ) {
-
-
-                        latitude =
-                            location.latitude.toString()
-
-                        longitude =
-                            location.longitude.toString()
-
-
-                        Log.d(
-                            "LOCATION",
-                            "사용자 위치 사용 : $latitude / $longitude"
-                        )
-
-                    } else {
-
-                        Log.d(
-                            "LOCATION",
-                            "비정상 위치 또는 위치 없음 → 서울 기본 위치 사용"
-                        )
-                    }
-
-                    requestRestaurantSearch(
-                        latitude,
-                        longitude
-                    )
-
-                }
-
-        } else {
-
-            Log.d(
-                "LOCATION",
-                "권한 없음 → 서울 기본 위치 사용"
-            )
-
-            requestRestaurantSearch(
-                latitude,
-                longitude
-            )
-
-        }
-
-    }
-
-    // 카카오 API 식당 검색 요청
+    // 카카오 API로 좌표 기반 주변 식당 검색
     private fun requestRestaurantSearch(
         latitude: String,
-        longitude: String
+        longitude: String,
+        profile: UserDietProfile
     ) {
 
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
 
-                val response =
-                    RetrofitClient.api.searchRestaurant(
+                val allPlaces = mutableListOf<KakaoPlace>()
 
-                        key =
-                            "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}",
+                for (page in 1..3) {
 
-                        longitude =
-                            longitude,
-
-                        latitude =
-                            latitude
-
+                    val response = RetrofitClient.api.searchRestaurant(
+                        key = "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}",
+                        longitude = longitude,
+                        latitude = latitude,
+                        page = page
                     )
 
-                if (response.isSuccessful) {
+                    if (response.isSuccessful) {
 
-                    val places =
-                        response.body()?.documents
-                            ?: emptyList()
+                        val places =
+                            response.body()?.documents ?: emptyList()
 
+                        Log.d(
+                            "KAKAO_PAGE",
+                            "page=$page / ${places.size}개"
+                        )
 
-                    Log.d(
-                        "KAKAO_RESULT",
-                        "검색된 식당 : ${places.size}"
-                    )
+                        allPlaces.addAll(places)
 
+                    } else {
 
-                    analyzeRestaurantsWithGemini(
-                        places.take(10)
-                    )
-
-                } else {
-
-                    Log.e(
-                        "KAKAO_ERROR",
-                        "code : ${response.code()}"
-                    )
-
+                        Log.e(
+                            "KAKAO_ERROR",
+                            "page=$page code=${response.code()}"
+                        )
+                    }
                 }
+                Log.d(
+                    "KAKAO_RESULT",
+                    "총 검색된 식당 : ${allPlaces.size}"
+                )
+
+                val uniquePlaces =
+                    allPlaces.distinctBy { it.place_name }
+
+                Log.d(
+                    "KAKAO_RESULT",
+                    "중복 제거 후 : ${uniquePlaces.size}"
+                )
+
+                analyzeRestaurantsWithGemini(
+                    uniquePlaces,
+                    profile
+                )
 
             } catch (e: Exception) {
 
@@ -234,72 +253,109 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     "KAKAO_ERROR",
                     e.toString()
                 )
-
             }
-
         }
-
     }
 
-    // 현재 위치 기반으로 검색된 식당 정보를 Gemini에게 전달 후 사용자 식단 조건에 맞는 식당 추천 결과 생성
+    // 검색된 식당 목록 + 사용자 프로필을 Gemini에 전달해 추천 결과 생성
     private fun analyzeRestaurantsWithGemini(
-        places: List<KakaoPlace>
+        places: List<KakaoPlace>,
+        profile: UserDietProfile
     ) {
-
-        Log.d(
-            "GEMINI_TEST", "Gemini 호출 시작 : ${places.size}"
-        )
+        Log.d("GEMINI_TEST", "Gemini 호출 시작 : ${places.size}")
 
         CoroutineScope(Dispatchers.IO).launch {
-
             try {
                 val geminiKey = BuildConfig.GEMINI_API_KEY
-                val restaurantData = places.joinToString("\n") {
 
+                val restaurantData = places.joinToString("\n") {
                     """
-                        식당명 : ${it.place_name}
-                        카테고리 : ${it.category_name}
-                        주소 : ${it.road_address_name}
-                        전화번호 : ${it.phone}
-                        """.trimIndent()
+                    식당명 : ${it.place_name}
+                    카테고리 : ${it.category_name}
+                    주소 : ${it.road_address_name}
+                    전화번호 : ${it.phone}
+                    """.trimIndent()
                 }
 
-                // 사용자 식당 조건, 카카오 식당 정보를 기반 추천 가능 식당을 JSON 형태로 반환하도록 요청
-                val prompt = """
+                val prompt = buildPrompt(profile, restaurantData)
+
+                val request = GeminiRequest(
+                    contents = listOf(Content(parts = listOf(Part(prompt))))
+                )
+
+                val response = callGeminiWithRetry {
+                    GeminiRetrofitClient.api.generate(apiKey = geminiKey, request = request)
+                }
+
+                Log.d("GEMINI_HTTP", "code=${response.code()}")
+
+                if (response.isSuccessful) {
+                    val result = response.body()?.candidates
+                        ?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                        ?: "[]"
+
+                    Log.d("GEMINI_RESULT", result)
+                    updateRecyclerView(result)
+                }
+
+            } catch (e: Exception) {
+                Log.e("GEMINI_ERROR", e.toString())
+                e.printStackTrace()
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "추천 생성 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    // Firestore에서 가져온 실제 사용자 프로필 기반으로 프롬프트 동적 생성
+    private fun buildPrompt(profile: UserDietProfile, restaurantData: String): String {
+
+        val allergyText =
+            if (profile.allergies.isEmpty() || profile.allergies.contains("NONE"))
+                "없음"
+            else
+                profile.allergies.joinToString(", ")
+
+        val preferenceText =
+            if (profile.preferences.isEmpty())
+                "특별한 제한 없음"
+            else
+                profile.preferences.joinToString(", ")
+        return """
 너는 식단 제한 사용자를 위한 음식점 추천 AI이다.
 
-사용자 정보
-- 종교 : 이슬람
-- 식단 : 할랄(Halal) 음식만 섭취 가능
+사용자 정보 (영문 코드로 제공됨)
+- 알레르기 코드 : $allergyText
+  (예 : PEANUTS=땅콩, TREE_NUTS=견과류, MILK=우유, EGGS=계란, SEAFOOD=해산물, WHEAT=밀,
+   SOY=대두, SESAME=참깨, CORN=옥수수, CHICKEN=닭고기, BEEF=소고기, PORK=돼지고기,
+   TOMATO=토마토, MUSHROOM=버섯, COCONUT=코코넛, KIWI=키위, PEACH=복숭아,
+   BANANA=바나나, GARLIC=마늘, ONION=양파, SPICES=향신료)
 
-할랄 기준
-- 돼지고기 사용 금지
-- 알코올 사용 금지
-- 할랄 인증 육류 사용 식당 선호
-- 중동 음식, 터키 음식, 인도 음식, 할랄 전문점은 우선 고려한다.
+- 식단 선호/제한 코드 : $preferenceText
+  (예 : VEGETARIAN=채식, VEGAN=비건, HALAL=할랄, KOSHER=코셔 등 사용자가 선택한 값)
 
 아래는 카카오 API에서 가져온 실제 식당 목록이다.
 
 $restaurantData
 
 규칙
-
 1. 반드시 아래 식당 목록 안에서만 추천한다.
 2. 존재하지 않는 식당은 절대 만들지 않는다.
-3. 사용자가 방문하기 적합한 식당만 추천한다.
-4. 추천 가능한 식당이 없다면 빈 배열 []을 반환한다.
-5. 최대 5개까지만 추천한다.
-6. 식당명과 주소는 입력값을 그대로 사용한다.
-7. feature에는 추천 이유를 한 문장으로 작성한다.
+3. 사용자의 알레르기 코드와 식단 선호 조건을 최대한 고려한다.
+4. 식당명과 카테고리만으로 판단 가능한 경우에는 추천한다. 정보가 부족하다고 해서 제외하지 않는다.
+5. 빈 배열([])은 정말 모든 식당이 명백하게 조건을 위반하는 경우에만 반환한다. 대부분의 경우에는 가장 적합한 식당을 최대 5개 추천한다.
+6. 최대 5개까지만 추천한다.
+7. 식당명과 주소는 입력값을 그대로 사용한다.
+8. feature에는 추천 이유를 한 문장으로 작성한다.
+9. tags에는 이 식당의 특징을 나타내는 태그를 0~2개 배열로 작성한다.
+   사용 가능한 태그 : "HALAL", "PORK_FREE", "VEGAN"
+   세 태그는 식당명이나 음식 종류로 일반적으로 추론 가능한 경우에는 붙여도 된다.
+   확실하지 않더라도 가능성이 높으면 태그를 붙여라. 
+   단, 명백히 틀린 태그는 붙이지 않는다.
 
-판단은 일반적으로 알려진 음식 종류와 식당명을 바탕으로 수행한다.
-확실하지 않은 경우에도
-일반적으로 알려진 음식 종류와
-식당명 및 카테고리를 바탕으로
-가장 가능성이 높은 식당을 추천한다.
-
-추천 가능한 식당을
-최대 5개 반환한다.
+판단은 일반적으로 알려진 음식 종류와 식당명, 카테고리를 바탕으로 가장 가능성이 높은 식당을 추천한다.
 
 반드시 JSON 배열만 출력한다.
 
@@ -307,150 +363,57 @@ $restaurantData
   {
     "name":"",
     "address":"",
-    "rating":4.5,
-    "feature":""
+    "feature":"",
+    "tags":["HALAL","PORK_FREE"]
   }
 ]
-
 """.trimIndent()
-
-
-                val request = GeminiRequest(
-                    contents = listOf(
-                        Content(
-                            parts = listOf(
-                                Part(prompt)
-                            )
-                        )
-                    )
-                )
-
-                val response =
-                    callGeminiWithRetry {
-
-                        GeminiRetrofitClient.api.generate(
-                            apiKey = geminiKey,
-                            request = request
-                        )
-
-                    }
-
-                Log.d(
-                    "GEMINI_HTTP", "code=${response.code()}"
-                )
-
-                Log.d(
-                    "GEMINI_HTTP", response.errorBody()?.string() ?: "no error"
-                )
-
-
-                if (response.isSuccessful) {
-
-                    val result =
-                        response.body()?.candidates
-                            ?.firstOrNull()
-                            ?.content
-                            ?.parts
-                            ?.firstOrNull()
-                            ?.text
-                            ?: "[]"
-
-                    Log.d(
-                        "GEMINI_RESULT",
-                        result
-                    )
-
-                    updateRecyclerView(result)
-                }
-
-                withContext(Dispatchers.Main) {
-
-                    Toast.makeText(
-                        requireContext(), "Gemini 응답 성공", Toast.LENGTH_LONG
-                    ).show()
-
-                }
-
-            } catch (e: Exception) {
-
-                Log.e(
-                    "GEMINI_ERROR", e.toString()
-                )
-
-                e.printStackTrace()
-
-                withContext(Dispatchers.Main) {
-
-                    Toast.makeText(
-                        requireContext(), "Gemini 오류 발생", Toast.LENGTH_LONG
-                    ).show()
-
-                }
-
-            }
-
-        }
-
     }
 
-    // Gemini 응답 JSON 데이터를 Restaurant 객체로 변환 후 RecyclerView 갱신
-    private suspend fun updateRecyclerView(
-        jsonString: String
-    ) {
-
+    // Gemini 응답 JSON을 Restaurant 객체로 변환 후 RecyclerView 갱신
+    private suspend fun updateRecyclerView(jsonString: String) {
         try {
+            val cleanJson = jsonString
+                .replace("```json", "")
+                .replace("```", "")
+                .trim()
 
-            val cleanJson =
-                jsonString
-                    .replace("```json", "")
-                    .replace("```", "")
-                    .trim()
-
-            val jsonArray =
-                JSONArray(cleanJson)
-
+            val jsonArray = JSONArray(cleanJson)
             val newList = mutableListOf<Restaurant>()
 
             for (i in 0 until jsonArray.length()) {
-
                 val obj = jsonArray.getJSONObject(i)
-
+                val tagsArray = obj.optJSONArray("tags")
+                val tags = mutableListOf<String>()
+                if (tagsArray != null) {
+                    for (j in 0 until tagsArray.length()) {
+                        tags.add(tagsArray.getString(j))
+                    }
+                }
                 newList.add(
-
                     Restaurant(
-
                         name = obj.getString("name"),
-
                         address = obj.getString("address"),
-
-                        rating = obj.getDouble("rating"),
-
-                        feature = obj.getString("feature")
-
+                        feature = obj.getString("feature"),
+                        tags = tags
                     )
-
                 )
-
             }
 
+            Log.d("RESTAURANT_SIZE", "newList 개수 = ${newList.size}")
+
             withContext(Dispatchers.Main) {
-
                 restaurantList.clear()
-
                 restaurantList.addAll(newList)
-
+                Log.d(
+                    "RESTAURANT_SIZE",
+                    "restaurantList 개수 = ${restaurantList.size}"
+                )
                 adapter.notifyDataSetChanged()
             }
 
         } catch (e: Exception) {
-
-            Log.e(
-                "JSON_ERROR", e.message ?: ""
-
-            )
-
+            Log.e("JSON_ERROR", e.message ?: "")
         }
-
     }
-
 }

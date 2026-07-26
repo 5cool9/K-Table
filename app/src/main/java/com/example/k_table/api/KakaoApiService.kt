@@ -21,7 +21,13 @@ interface KakaoApiService {
         latitude: String,
 
         @Query("radius")
-        radius: Int = 2000
+        radius: Int = 2000,
+
+        @Query("size")
+        size: Int = 15,
+
+        @Query("page")
+        page: Int = 1
 
     ): retrofit2.Response<KakaoResponse>
 }

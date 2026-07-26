@@ -29,9 +29,6 @@
             android:exported="false" />
         <activity
             android:name=".onboarding.Onboarding1Activity"
-            android:exported="false" />
-        <activity
-            android:name=".onboarding.OnboardingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
