@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
@@ -27,11 +28,11 @@
         android:id="@+id/txtGreen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="136dp"
         android:text="Scan Any Menu"
         android:textColor="#0A8F3D"
-        android:textSize="35sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +43,7 @@
         android:layout_height="wrap_content"
         android:text="with AI"
         android:textColor="#222222"
-        android:textSize="35sp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtGreen" />
@@ -58,22 +59,22 @@
         android:id="@+id/txtDesc"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         android:text="Scan any menu, and we'll check it against your dietary preferences and allergies to recommend suitable dishes."
         android:textColor="#777777"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtBlack" />
 
     <ImageView
         android:id="@+id/imgPhone"
-        android:layout_width="0dp"
-        android:layout_height="380dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="428dp"
+        android:layout_height="389dp"
+        android:layout_marginTop="56dp"
         android:scaleType="fitCenter"
         android:src="@drawable/onboarding_scan"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.529"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtDesc" />
 
