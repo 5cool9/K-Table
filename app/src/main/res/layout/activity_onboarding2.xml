@@ -50,19 +50,19 @@
         android:id="@+id/txtDesc"
         android:layout_width="290dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
         android:text="Get tailored food and restaurant recommendations that fit your diet and preferences."
         android:textColor="#7A7A7A"
-        android:textSize="20sp"
-        android:layout_marginTop="18dp"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
-        app:layout_constraintTop_toBottomOf="@id/txtBlack"/>
+        app:layout_constraintTop_toBottomOf="@id/txtBlack" />
 
 
     <ImageView
         android:id="@+id/imgFood"
         android:layout_width="0dp"
         android:layout_height="420dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="44dp"
         android:scaleType="centerCrop"
         android:src="@drawable/onboarding_food"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,17 +70,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtDesc" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNext"
         android:layout_width="280dp"
         android:layout_height="55dp"
+        android:layout_marginBottom="55dp"
         android:text="Next"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
+        android:textSize="18sp"
         android:backgroundTint="#0A8F3D"
-        android:translationY="-35dp"
         app:cornerRadius="28dp"
-        app:layout_constraintBottom_toTopOf="@id/layoutDots"
+
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -90,27 +92,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="12dp"
+
+        app:layout_constraintTop_toBottomOf="@id/btnNext"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:layout_margin="4dp"
-            />
+            android:background="@drawable/dot_active"/>
 
         <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:layout_margin="4dp"
-            />
-
-        <View
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_margin="4dp" />
+            android:background="@drawable/dot_inactive"/>
 
     </LinearLayout>
 
