@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import com.example.k_table.model.GeminiRequest
 import com.example.k_table.api.GeminiRetrofitClient
+import com.example.k_table.api.GooglePlacesRetrofitClient
 import com.example.k_table.model.Content
 import com.example.k_table.model.Part
 import com.example.k_table.model.GeminiResponse
@@ -28,6 +29,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 // Firestore에서 불러온 사용자 식단 프로필
 data class UserDietProfile(
@@ -390,21 +394,37 @@ $restaurantData
                         tags.add(tagsArray.getString(j))
                     }
                 }
-                newList.add(
-                    Restaurant(
-                        name = obj.getString("name"),
-                        address = obj.getString("address"),
-                        feature = obj.getString("feature"),
-                        tags = tags
-                    )
+                val restaurant = Restaurant(
+                    name = obj.getString("name"),
+                    address = obj.getString("address"),
+                    feature = obj.getString("feature"),
+                    tags = tags
                 )
+
+                newList.add(restaurant)
+            }
+
+            val updatedList = coroutineScope {
+
+                newList.map { restaurant ->
+
+                    async {
+
+                        restaurant.imageUrl =
+                            getRestaurantImageUrl(restaurant.name)
+
+                        restaurant
+                    }
+
+                }.awaitAll()
+
             }
 
             Log.d("RESTAURANT_SIZE", "newList 개수 = ${newList.size}")
 
             withContext(Dispatchers.Main) {
                 restaurantList.clear()
-                restaurantList.addAll(newList)
+                restaurantList.addAll(updatedList)
                 Log.d(
                     "RESTAURANT_SIZE",
                     "restaurantList 개수 = ${restaurantList.size}"
@@ -414,6 +434,47 @@ $restaurantData
 
         } catch (e: Exception) {
             Log.e("JSON_ERROR", e.message ?: "")
+        }
+    }
+
+    private suspend fun getRestaurantImageUrl(
+        restaurantName: String
+    ): String? {
+
+        return try {
+
+            val response = GooglePlacesRetrofitClient.api.searchPlace(
+                query = restaurantName,
+                apiKey = BuildConfig.GOOGLE_MAPS_API_KEY
+            )
+
+            val photoReference =
+                response.results
+                    .firstOrNull()
+                    ?.photos
+                    ?.firstOrNull()
+                    ?.photo_reference
+
+
+            if (photoReference != null) {
+
+                "https://maps.googleapis.com/maps/api/place/photo" +
+                        "?maxwidth=400" +
+                        "&photo_reference=$photoReference" +
+                        "&key=${BuildConfig.GOOGLE_MAPS_API_KEY}"
+
+            } else {
+                null
+            }
+
+        } catch (e: Exception) {
+
+            Log.e(
+                "GOOGLE_PLACE_ERROR",
+                e.toString()
+            )
+
+            null
         }
     }
 }

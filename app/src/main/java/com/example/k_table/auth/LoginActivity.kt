@@ -2,10 +2,12 @@ package com.example.k_table
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import androidx.credentials.CredentialManager
@@ -36,6 +38,7 @@ class LoginActivity : AppCompatActivity() {
         // 구글 로그인 버튼 클릭 시
         val btnGoogleLogin = findViewById<LinearLayout>(R.id.btnGoogleLogin)
         btnGoogleLogin.setOnClickListener {
+            Log.d("GOOGLE_TEST", "버튼 클릭")
             signInWithGoogle()
         }
 
@@ -62,10 +65,14 @@ class LoginActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
 
             try {
+                Log.d("GOOGLE_TEST", "credential 호출 전")
+
                 val result = credentialManager.getCredential(
                     request = request,
                     context = this@LoginActivity
                 )
+
+                Log.d("GOOGLE_TEST", "credential 호출 성공")
 
                 val credential = result.credential
 
@@ -93,7 +100,25 @@ class LoginActivity : AppCompatActivity() {
                     }
 
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("GOOGLE_LOGIN_ERROR", e.message.toString())
+
+                Toast.makeText(
+                    this@LoginActivity,
+                    "등록된 Google 계정이 없습니다. 계정을 추가후 다시 시작해주세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+
+                val intent = Intent(
+                    android.provider.Settings.ACTION_ADD_ACCOUNT
+                )
+
+                intent.putExtra(
+                    android.provider.Settings.EXTRA_ACCOUNT_TYPES,
+                    arrayOf("com.google")
+                )
+
+                startActivity(intent)
             }
         }
     }
