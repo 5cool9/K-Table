@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.k_table.model.Restaurant
 
 class RestaurantAdapter(private val items: List<Restaurant>) :
@@ -41,8 +42,20 @@ class RestaurantAdapter(private val items: List<Restaurant>) :
         holder.tvAddress.text = item.address
         holder.tvFeature.text = item.feature
 
-        // 사진은 자체 기본 이미지 사용 (카카오 API가 사진을 제공하지 않음)
-        holder.imgRestaurant.setImageResource(R.drawable.none_place)
+        if (item.imageUrl != null) {
+
+            Glide.with(holder.itemView.context)
+                .load(item.imageUrl)
+                .centerCrop()
+                .placeholder(R.drawable.none_place)
+                .error(R.drawable.none_place)
+                .into(holder.imgRestaurant)
+
+        } else {
+
+            holder.imgRestaurant.setImageResource(R.drawable.none_place)
+
+        }
 
         // 태그 동적으로 그리기
         holder.layoutTags.removeAllViews()

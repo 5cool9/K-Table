@@ -5,4 +5,5 @@ data class Restaurant(
     val address: String,
     val feature: String,
     val tags: List<String> = emptyList(),
+    var imageUrl: String? = null
 )

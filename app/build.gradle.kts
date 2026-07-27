@@ -25,6 +25,11 @@ val geminiApiKey = localProperties.getProperty(
     ""
 )
 
+val googleMapsApiKey = localProperties.getProperty(
+    "GOOGLE_MAPS_API_KEY",
+    ""
+)
+
 android {
     namespace = "com.example.k_table"
     compileSdk = 36
@@ -36,6 +41,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = googleMapsApiKey
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
@@ -48,6 +54,12 @@ android {
             "String",
             "GEMINI_API_KEY",
             "\"$geminiApiKey\""
+        )
+
+        buildConfigField(
+            "String",
+            "GOOGLE_MAPS_API_KEY",
+            "\"$googleMapsApiKey\""
         )
     }
 
@@ -116,5 +128,6 @@ dependencies {
     implementation("androidx.camera:camera-view:1.4.2")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
 }
