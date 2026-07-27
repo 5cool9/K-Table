@@ -20,30 +20,32 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Personalized -->
+
+    <!-- Recommendations -->
+
     <TextView
         android:id="@+id/txtGreen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="172dp"
         android:text="Personalized"
-        android:textStyle="bold"
-        android:textSize="35sp"
         android:textColor="#028334"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="100dp"
+        android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Recommendations -->
     <TextView
         android:id="@+id/txtBlack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Recommendations"
-        android:textStyle="bold"
-        android:textSize="35sp"
         android:textColor="#2D2F34"
+        android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
-        app:layout_constraintTop_toBottomOf="@id/txtGreen"/>
+        app:layout_constraintTop_toBottomOf="@id/txtGreen" />
 
     <!-- Description -->
     <TextView
@@ -53,7 +55,7 @@
         android:layout_marginTop="18dp"
         android:text="Get tailored food and restaurant recommendations that fit your diet and preferences."
         android:textColor="#7A7A7A"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtBlack" />
 
@@ -62,7 +64,7 @@
         android:id="@+id/imgFood"
         android:layout_width="0dp"
         android:layout_height="420dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="136dp"
         android:scaleType="centerCrop"
         android:src="@drawable/onboarding_food"
         app:layout_constraintEnd_toEndOf="parent"
