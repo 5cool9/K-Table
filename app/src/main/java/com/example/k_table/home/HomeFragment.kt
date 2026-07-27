@@ -2,8 +2,10 @@ package com.example.k_table.home
 
 import com.example.k_table.BuildConfig
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -26,14 +28,15 @@ import com.example.k_table.model.Part
 import com.example.k_table.model.GeminiResponse
 import com.example.k_table.model.Restaurant
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 
-// Firestore에서 불러온 사용자 식단 프로필
+
 data class UserDietProfile(
     val allergies: List<String>,
     val preferences: List<String>
@@ -45,11 +48,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var adapter: RestaurantAdapter
     private val restaurantList = mutableListOf<Restaurant>()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    // 한번 불러온 프로필은 재사용 (버튼 다시 눌러도 Firestore 재조회 안 하도록)
     private var cachedUserProfile: UserDietProfile? = null
+    private lateinit var layoutLoading: LinearLayout
+    private lateinit var layoutError: LinearLayout
+    private lateinit var locationCallback: LocationCallback
+    private var isSearching = false
 
-    // 위치 권한 요청 런처 - 반드시 Fragment 필드로 등록 (onViewCreated 안 X)
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -65,6 +69,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        layoutLoading = view.findViewById(R.id.layoutLoading)
+        layoutError = view.findViewById(R.id.layoutError)
 
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
@@ -76,6 +82,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         val btnLocation = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLocation)
         btnLocation.setOnClickListener {
+            if (isSearching) {
+                return@setOnClickListener
+            }
             requestLocationPermissionAndSearch()
         }
 
@@ -99,6 +108,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     // 실제 현재 위치를 가져와서 검색
     private fun fetchCurrentLocationAndSearch() {
 
+        if (isSearching) return
+        isSearching = true
+        showLoadingScreen()
+        restaurantList.clear()
+        adapter.notifyDataSetChanged()
+
         val hasPermission = requireContext().checkSelfPermission(
             android.Manifest.permission.ACCESS_FINE_LOCATION
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -109,23 +124,71 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             return
         }
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null
-                && location.latitude in 33.0..39.0
-                && location.longitude in 124.0..132.0
-            ) {
-                Log.d("LOCATION", "사용자 위치 사용 : ${location.latitude} / ${location.longitude}")
-                startSearch(location.latitude.toString(), location.longitude.toString())
-            } else {
-                Log.d("LOCATION", "비정상 위치 → 서울 기본 위치 사용")
-                Toast.makeText(requireContext(), "현재 위치를 확인할 수 없어 기본 위치로 검색합니다.", Toast.LENGTH_SHORT).show()
-                startSearch("37.5665", "126.9780")
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            1000
+        )
+            .setMaxUpdates(1)
+            .build()
+
+        locationCallback = object : LocationCallback() {
+
+            override fun onLocationResult(result: LocationResult) {
+
+                val location = result.lastLocation
+
+
+                if (location != null
+                    && location.latitude in 33.0..39.0
+                    && location.longitude in 124.0..132.0
+                ) {
+
+                    Log.d(
+                        "LOCATION",
+                        "사용자 위치 사용 : ${location.latitude} / ${location.longitude}"
+                    )
+
+                    startSearch(
+                        location.latitude.toString(),
+                        location.longitude.toString()
+                    )
+
+                } else {
+
+                    Log.d(
+                        "LOCATION",
+                        "비정상 위치 : ${location?.latitude} / ${location?.longitude}"
+                    )
+
+                    Toast.makeText(
+                        requireContext(),
+                        "현재 위치를 확인할 수 없어 기본 위치로 검색합니다.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    startSearch(
+                        "37.5665",
+                        "126.9780"
+                    )
+                }
+
+                // 한번 가져왔으면 종료
+                fusedLocationClient.removeLocationUpdates(this)
             }
         }
+
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
     }
 
     // 프로필이 캐시되어 있으면 바로, 없으면 Firestore에서 불러온 뒤 검색 시작
     private fun startSearch(latitude: String, longitude: String) {
+
+        showLoadingScreen()
+
         val profile = cachedUserProfile
         if (profile != null) {
             requestRestaurantSearch(latitude, longitude, profile)
@@ -180,7 +243,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 return response
             }
 
-            if (response.code() == 503) {
+            if (response.code() == 503 || response.code() == 429) {
                 Log.d("GEMINI_RETRY", "${attempt + 1}번째 재시도")
                 kotlinx.coroutines.delay(3000)
             } else {
@@ -257,6 +320,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     "KAKAO_ERROR",
                     e.toString()
                 )
+                withContext(Dispatchers.Main) {
+                    showErrorScreen()
+                }
             }
         }
     }
@@ -270,15 +336,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
+
                 val geminiKey = BuildConfig.GEMINI_API_KEY
 
                 val restaurantData = places.joinToString("\n") {
                     """
-                    식당명 : ${it.place_name}
-                    카테고리 : ${it.category_name}
-                    주소 : ${it.road_address_name}
-                    전화번호 : ${it.phone}
-                    """.trimIndent()
+                식당명 : ${it.place_name}
+                카테고리 : ${it.category_name}
+                주소 : ${it.road_address_name}
+                전화번호 : ${it.phone}
+                """.trimIndent()
                 }
 
                 val prompt = buildPrompt(profile, restaurantData)
@@ -288,26 +355,41 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 )
 
                 val response = callGeminiWithRetry {
-                    GeminiRetrofitClient.api.generate(apiKey = geminiKey, request = request)
+                    GeminiRetrofitClient.api.generate(
+                        apiKey = geminiKey,
+                        request = request
+                    )
                 }
 
                 Log.d("GEMINI_HTTP", "code=${response.code()}")
 
                 if (response.isSuccessful) {
+
                     val result = response.body()?.candidates
                         ?.firstOrNull()?.content?.parts?.firstOrNull()?.text
                         ?: "[]"
 
                     Log.d("GEMINI_RESULT", result)
-                    updateRecyclerView(result)
-                }
 
+                    updateRecyclerView(result)
+
+                } else {
+
+                    Log.e(
+                        "GEMINI_ERROR",
+                        "Gemini 응답 실패 code=${response.code()}"
+                    )
+
+                    withContext(Dispatchers.Main) {
+                        showErrorScreen()
+                    }
+                }
             } catch (e: Exception) {
                 Log.e("GEMINI_ERROR", e.toString())
                 e.printStackTrace()
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "추천 생성 중 오류가 발생했습니다.", Toast.LENGTH_LONG).show()
+                    showErrorScreen()
                 }
             }
         }
@@ -404,37 +486,57 @@ $restaurantData
                 newList.add(restaurant)
             }
 
-            val updatedList = coroutineScope {
-
-                newList.map { restaurant ->
-
-                    async {
-
-                        restaurant.imageUrl =
-                            getRestaurantImageUrl(restaurant.name)
-
-                        restaurant
-                    }
-
-                }.awaitAll()
-
-            }
-
             Log.d("RESTAURANT_SIZE", "newList 개수 = ${newList.size}")
 
             withContext(Dispatchers.Main) {
                 restaurantList.clear()
-                restaurantList.addAll(updatedList)
-                Log.d(
-                    "RESTAURANT_SIZE",
-                    "restaurantList 개수 = ${restaurantList.size}"
-                )
+                restaurantList.addAll(newList)
+
                 adapter.notifyDataSetChanged()
+
+                layoutLoading.visibility = View.GONE
+                layoutError.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+
+                isSearching = false
+            }
+
+            CoroutineScope(Dispatchers.IO).launch {
+
+                newList.forEachIndexed { index, restaurant ->
+
+                    val imageUrl = getRestaurantImageUrl(restaurant.name)
+
+                    restaurant.imageUrl = imageUrl
+
+                    withContext(Dispatchers.Main) {
+                        adapter.notifyItemChanged(index)
+                    }
+                }
             }
 
         } catch (e: Exception) {
             Log.e("JSON_ERROR", e.message ?: "")
+
+            withContext(Dispatchers.Main) {
+                showErrorScreen()
+            }
         }
+    }
+
+    private fun showErrorScreen() {
+
+        layoutLoading.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        layoutError.visibility = View.VISIBLE
+        isSearching = false
+    }
+
+    private fun showLoadingScreen() {
+
+        layoutLoading.visibility = View.VISIBLE
+        layoutError.visibility = View.GONE
+        recyclerView.visibility = View.GONE
     }
 
     private suspend fun getRestaurantImageUrl(
