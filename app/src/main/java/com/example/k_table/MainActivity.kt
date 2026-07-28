@@ -23,8 +23,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        // 앱 실행 시 기본 화면 = 홈
-        changeFragment(HomeFragment())
+        // 앱 실행 시 기본 화면 = 홈, 스캔화면에서 다시 시도 눌렀을 때는 사진 선택 화면으로 이동
+        val openScan =
+            intent.getBooleanExtra(
+                "openScan",
+                false
+            )
+        if(openScan){
+            changeFragment(
+                ScanFragment()
+            )
+        }else{
+
+            changeFragment(
+                HomeFragment()
+            )
+        }
 
 
         val homeTab =

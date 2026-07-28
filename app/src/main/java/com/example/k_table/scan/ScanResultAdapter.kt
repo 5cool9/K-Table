@@ -15,7 +15,7 @@ import com.example.k_table.model.SuitabilityStatus
 import android.content.Context
 
 class ScanResultAdapter(
-    private val tts: TextToSpeech
+    private val onListenClick: (String?) -> Unit
 ) : ListAdapter<MenuScanResult, ScanResultAdapter.ScanResultViewHolder>(DiffCallback) {
 
     // 현재 펼쳐진 아이템의 id 를 저장
@@ -97,16 +97,15 @@ class ScanResultAdapter(
                 .setDuration(150)
                 .start()
 
-            // TTS 음성 듣기 버튼
+            binding.btnListen.visibility =
+                if (item.questionKo.isNullOrEmpty())
+                    View.GONE
+                else
+                    View.VISIBLE
+
             binding.btnListen.setOnClickListener {
-                item.questionKo?.let { text ->
-                    tts.language = java.util.Locale.KOREAN
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, item.id)
-                }
+                onListenClick(item.questionKo)
             }
-
-            val container = binding.root.findViewById<LinearLayout>(R.id.cardContainer)
-
         }
     }
 
