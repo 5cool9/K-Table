@@ -30,6 +30,7 @@
             android:focusable="true" />
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sign Up 2/4"

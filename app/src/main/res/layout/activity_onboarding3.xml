@@ -21,19 +21,6 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/txtGreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="136dp"
-        android:text="Scan Any Menu"
-        android:textColor="#0A8F3D"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/txtBlack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,6 +30,19 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@id/txtGreen"
         app:layout_constraintTop_toBottomOf="@id/txtGreen" />
+
+    <TextView
+        android:id="@+id/txtGreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="136dp"
+        android:text="Scan Any Menu"
+        android:textColor="#0A8F3D"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtDesc"

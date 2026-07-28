@@ -10,22 +10,56 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class Preference4Activity : AppCompatActivity() {
+
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    private var isEditMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference_4)
 
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack.setOnClickListener { finish() }
+        isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
 
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+
+        if (isEditMode) {
+
+            tvTitle.text = "알레르기 설정"
+        }
+
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
         val cardOther = findViewById<LinearLayout>(R.id.cardOther)
         val btnNone = findViewById<TextView>(R.id.btnNone)
         val btnComplete = findViewById<AppCompatButton>(R.id.btnComplete)
 
-        // 세부 알레르기 카드 목록
+        btnBack.setOnClickListener {
+
+            if (isEditMode) {
+
+                val intent =
+                    Intent(this, MainActivity::class.java)
+
+                intent.putExtra(
+                    "OPEN_MYPAGE",
+                    true
+                )
+                startActivity(intent)
+
+                finish()
+
+            } else {
+
+                finish()
+            }
+        }
+
+
         val detailedCards = listOf(
             findViewById<LinearLayout>(R.id.cardCorn),
             findViewById<LinearLayout>(R.id.cardChicken),
@@ -42,12 +76,12 @@ class Preference4Activity : AppCompatActivity() {
             findViewById<LinearLayout>(R.id.cardSpices)
         )
 
-        // 앱이 처음 켜졌을 때 세부 카드들은 숨겨두기
-        for (detailCard in detailedCards) {
-            detailCard.visibility = View.GONE
+
+        for (card in detailedCards) {
+            card.visibility = View.GONE
         }
 
-        // 기본 카드 목록
+
         val defaultCards = listOf(
             findViewById<LinearLayout>(R.id.cardPeanuts),
             findViewById<LinearLayout>(R.id.cardTreeNuts),
@@ -59,56 +93,101 @@ class Preference4Activity : AppCompatActivity() {
             findViewById<LinearLayout>(R.id.cardSesame)
         )
 
+
         val allAllergyCards = defaultCards + detailedCards
 
+
+
         fun updateState() {
-            val isAnyAllergySelected = allAllergyCards.any { it.isSelected }
-            val isNoneSelected = btnNone.isSelected
 
-            btnComplete.isEnabled = isAnyAllergySelected || isNoneSelected
+            val isAnySelected =
+                allAllergyCards.any { it.isSelected }
 
-            // None 버튼 텍스트 색상 처리
-            btnNone.setTextColor(if (btnNone.isSelected) Color.WHITE else Color.parseColor("#008000"))
+            btnComplete.isEnabled =
+                isAnySelected || btnNone.isSelected
+
+
+            btnNone.setTextColor(
+                if (btnNone.isSelected)
+                    Color.WHITE
+                else
+                    Color.parseColor("#008000")
+            )
         }
 
-        // 초기 진입 시 버튼 비활성화 상태 맞추기
-        updateState()
 
-        // 기본 카드들 클릭 리스너
+
+        if (isEditMode) {
+
+            btnComplete.text = "완료"
+
+            loadUserAllergies(
+                allAllergyCards,
+                btnNone
+            )
+
+        } else {
+
+            updateState()
+        }
+
+
+
         for (card in defaultCards) {
+
             card.setOnClickListener {
-                // 알레르기 카드를 누르면 None은 무조건 선택 해제
+
                 btnNone.isSelected = false
-                card.isSelected = !card.isSelected
+
+                card.isSelected =
+                    !card.isSelected
+
                 updateState()
             }
         }
 
-        // 세부 카드들 클릭 리스너
+
+
         for (card in detailedCards) {
+
             card.setOnClickListener {
-                // 세부 카드를 누르면 None은 무조건 선택 해제
+
                 btnNone.isSelected = false
-                card.isSelected = !card.isSelected
+
+                card.isSelected =
+                    !card.isSelected
+
                 updateState()
             }
         }
 
-        // Other 버튼 클릭 리스너
-        cardOther.setOnClickListener {
-            val gridDefaultAllergy = findViewById<GridLayout>(R.id.gridDefaultAllergy)
 
-            gridDefaultAllergy.removeView(cardOther)
+
+        cardOther.setOnClickListener {
+
+            val gridDefaultAllergy =
+                findViewById<GridLayout>(R.id.gridDefaultAllergy)
+
+
+            if (cardOther.parent != null) {
+                gridDefaultAllergy.removeView(cardOther)
+            }
+
 
             for (detailCard in detailedCards) {
                 gridDefaultAllergy.removeView(detailCard)
             }
 
+
             for (detailCard in detailedCards) {
-                detailCard.visibility = View.VISIBLE
+
+                detailCard.visibility =
+                    View.VISIBLE
+
                 gridDefaultAllergy.addView(detailCard)
             }
         }
+
 
 
         btnNone.setOnClickListener {
@@ -117,17 +196,20 @@ class Preference4Activity : AppCompatActivity() {
                 card.isSelected = false
             }
 
-            btnNone.isSelected = !btnNone.isSelected
+            btnNone.isSelected =
+                !btnNone.isSelected
+
             updateState()
         }
 
-        // 완료 버튼
-        btnComplete.setOnClickListener {
-            val userNickname = intent.getStringExtra("USER_NICKNAME") ?: "USER"
-            val userLanguage = intent.getStringExtra("USER_LANGUAGE") ?: "Korean"
-            val userPreferences = intent.getStringArrayListExtra("USER_PREFERENCES") ?: arrayListOf()
 
-            val selectedAllergies = mutableListOf<String>()
+
+        btnComplete.setOnClickListener {
+
+
+            val selectedAllergies =
+                mutableListOf<String>()
+
 
             val allergyKeyMap = mapOf(
                 R.id.cardPeanuts to "PEANUTS",
@@ -153,44 +235,300 @@ class Preference4Activity : AppCompatActivity() {
                 R.id.cardSpices to "SPICES"
             )
 
+
             for (card in allAllergyCards) {
+
                 if (card.isSelected) {
-                    // ID에 매칭되는 고유 키값을 가져와서 리스트에 추가
+
                     allergyKeyMap[card.id]?.let { key ->
+
                         selectedAllergies.add(key)
+
                     }
                 }
             }
+
 
             if (btnNone.isSelected) {
+
                 selectedAllergies.add("NONE")
+
             }
 
-            val userInfo = UserPreference(
-                nickname = userNickname,
-                language = userLanguage,
-                preferences = userPreferences,
-                allergies = selectedAllergies
-            )
 
-            val currentUserUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: userNickname
 
-            val db = FirebaseFirestore.getInstance()
-            db.collection("users").document(currentUserUid)
-                .set(userInfo)
-                .addOnSuccessListener {
-                    // 저장 성공 시 홈 화면으로 이동
-                    val nextIntent = Intent(this, WelcomeActivity::class.java).apply {
-                        putExtra("USER_NICKNAME", userNickname)
+            if (isEditMode) {
+
+
+                updateAllergies(
+                    selectedAllergies
+                )
+
+
+            } else {
+
+
+                val userNickname =
+                    intent.getStringExtra("USER_NICKNAME")
+                        ?: "USER"
+
+
+                val userLanguage =
+                    intent.getStringExtra("USER_LANGUAGE")
+                        ?: "Korean"
+
+
+                val userPreferences =
+                    intent.getStringArrayListExtra(
+                        "USER_PREFERENCES"
+                    ) ?: arrayListOf()
+
+
+
+                val userInfo = UserPreference(
+                    nickname = userNickname,
+                    language = userLanguage,
+                    preferences = userPreferences,
+                    allergies = selectedAllergies
+                )
+
+
+                val uid =
+                    auth.currentUser?.uid
+                        ?: userNickname
+
+
+
+                db.collection("users")
+                    .document(uid)
+                    .set(userInfo)
+                    .addOnSuccessListener {
+
+
+                        val nextIntent =
+                            Intent(
+                                this,
+                                WelcomeActivity::class.java
+                            ).apply {
+
+                                putExtra(
+                                    "USER_NICKNAME",
+                                    userNickname
+                                )
+                            }
+
+
+                        startActivity(nextIntent)
+
+                        finish()
+
                     }
-                    startActivity(nextIntent)
-                    finish()
-                }
-                .addOnFailureListener { e ->
-                    // 실패 시 처리
+            }
+        }
+    }
+
+
+
+    private fun loadUserAllergies(
+        cards: List<LinearLayout>,
+        btnNone: TextView
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        db.collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+
+                val allergies =
+                    document.get("allergies")
+                            as? List<String>
+                        ?: emptyList()
+
+                val detailAllergies = listOf(
+                    "CORN",
+                    "CHICKEN",
+                    "BEEF",
+                    "PORK",
+                    "TOMATO",
+                    "MUSHROOM",
+                    "COCONUT",
+                    "KIWI",
+                    "PEACH",
+                    "BANANA",
+                    "GARLIC",
+                    "ONION",
+                    "SPICES"
+                )
+
+                if (allergies.any { detailAllergies.contains(it) }) {
+                    openDetailAllergy()
                 }
 
 
+                for (card in cards) {
+
+                    when (card.id) {
+
+                        R.id.cardPeanuts ->
+                            card.isSelected =
+                                allergies.contains("PEANUTS")
+
+                        R.id.cardTreeNuts ->
+                            card.isSelected =
+                                allergies.contains("TREE_NUTS")
+
+                        R.id.cardMilk ->
+                            card.isSelected =
+                                allergies.contains("MILK")
+
+                        R.id.cardEggs ->
+                            card.isSelected =
+                                allergies.contains("EGGS")
+
+                        R.id.cardSeafood ->
+                            card.isSelected =
+                                allergies.contains("SEAFOOD")
+
+                        R.id.cardWheat ->
+                            card.isSelected =
+                                allergies.contains("WHEAT")
+
+                        R.id.cardSoy ->
+                            card.isSelected =
+                                allergies.contains("SOY")
+
+                        R.id.cardSesame ->
+                            card.isSelected =
+                                allergies.contains("SESAME")
+
+                        R.id.cardCorn ->
+                            card.isSelected =
+                                allergies.contains("CORN")
+
+                        R.id.cardChicken ->
+                            card.isSelected =
+                                allergies.contains("CHICKEN")
+
+                        R.id.cardBeef ->
+                            card.isSelected =
+                                allergies.contains("BEEF")
+
+                        R.id.cardPork ->
+                            card.isSelected =
+                                allergies.contains("PORK")
+
+                        R.id.cardTomato ->
+                            card.isSelected =
+                                allergies.contains("TOMATO")
+
+                        R.id.cardMushroom ->
+                            card.isSelected =
+                                allergies.contains("MUSHROOM")
+
+                        R.id.cardCoconut ->
+                            card.isSelected =
+                                allergies.contains("COCONUT")
+
+                        R.id.cardKiwi ->
+                            card.isSelected =
+                                allergies.contains("KIWI")
+
+                        R.id.cardPeach ->
+                            card.isSelected =
+                                allergies.contains("PEACH")
+
+                        R.id.cardBanana ->
+                            card.isSelected =
+                                allergies.contains("BANANA")
+
+                        R.id.cardGarlic ->
+                            card.isSelected =
+                                allergies.contains("GARLIC")
+
+                        R.id.cardOnion ->
+                            card.isSelected =
+                                allergies.contains("ONION")
+
+                        R.id.cardSpices ->
+                            card.isSelected =
+                                allergies.contains("SPICES")
+                    }
+                }
+
+
+                btnNone.isSelected =
+                    allergies.contains("NONE")
+
+
+                findViewById<AppCompatButton>(R.id.btnComplete)
+                    .isEnabled =
+                    allergies.isNotEmpty()
+            }
+    }
+
+
+
+    private fun updateAllergies(
+        allergies: MutableList<String>
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        db.collection("users")
+            .document(uid)
+            .update(
+                "allergies",
+                allergies
+            )
+            .addOnSuccessListener {
+
+                finish()
+
+            }
+    }
+    private fun openDetailAllergy() {
+
+        val gridDefaultAllergy =
+            findViewById<GridLayout>(R.id.gridDefaultAllergy)
+
+        val cardOther =
+            findViewById<LinearLayout>(R.id.cardOther)
+
+
+        val detailedCards = listOf(
+            findViewById<LinearLayout>(R.id.cardCorn),
+            findViewById<LinearLayout>(R.id.cardChicken),
+            findViewById<LinearLayout>(R.id.cardBeef),
+            findViewById<LinearLayout>(R.id.cardPork),
+            findViewById<LinearLayout>(R.id.cardTomato),
+            findViewById<LinearLayout>(R.id.cardMushroom),
+            findViewById<LinearLayout>(R.id.cardCoconut),
+            findViewById<LinearLayout>(R.id.cardKiwi),
+            findViewById<LinearLayout>(R.id.cardPeach),
+            findViewById<LinearLayout>(R.id.cardBanana),
+            findViewById<LinearLayout>(R.id.cardGarlic),
+            findViewById<LinearLayout>(R.id.cardOnion),
+            findViewById<LinearLayout>(R.id.cardSpices)
+        )
+
+
+        gridDefaultAllergy.removeView(cardOther)
+
+
+        for (detailCard in detailedCards) {
+
+            gridDefaultAllergy.removeView(detailCard)
+
+            detailCard.visibility = View.VISIBLE
+
+            gridDefaultAllergy.addView(detailCard)
         }
     }
 }

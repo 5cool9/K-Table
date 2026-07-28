@@ -75,6 +75,7 @@
             android:name=".auth.SignupActivity"
             android:exported="false" />
 
+
     </application>
 
 </manifest>

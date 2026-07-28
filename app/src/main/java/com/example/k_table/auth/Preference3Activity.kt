@@ -7,22 +7,54 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Preference3Activity : AppCompatActivity() {
+
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    private var isEditMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference_3)
 
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack.setOnClickListener {
-            finish()
+        isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
+
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+
+        if (isEditMode) {
+
+            tvTitle.text = "선호 설정"
         }
 
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
         val btnNone = findViewById<TextView>(R.id.btnNone)
         val btnNext = findViewById<AppCompatButton>(R.id.btnNext)
 
-        // 일반 취향 카드들 목록
+        btnBack.setOnClickListener {
+
+            if (isEditMode) {
+
+                val intent =
+                    Intent(this, MainActivity::class.java)
+
+                intent.putExtra(
+                    "OPEN_MYPAGE",
+                    true
+                )
+                startActivity(intent)
+
+                finish()
+
+            } else {
+
+                finish()
+            }
+        }
+
         val normalCards = listOf(
             findViewById<TextView>(R.id.btnHalal),
             findViewById<TextView>(R.id.btnVegetarian),
@@ -33,58 +65,89 @@ class Preference3Activity : AppCompatActivity() {
             findViewById<TextView>(R.id.btnAlcoholFree)
         )
 
-        val allCards = normalCards + btnNone
 
-        //선택 상태를 체크하고 Next 버튼 활성화/비활성화 및 텍스트 색상을 일괄 업데이트하는 함수
         fun updateState() {
-            // 일반 카드 중 하나라도 선택되었는지 확인
-            val isAnyNormalSelected = normalCards.any { it.isSelected }
-            // None이 선택되었는지 확인
-            val isNoneSelected = btnNone.isSelected
 
-            btnNext.isEnabled = isAnyNormalSelected || isNoneSelected
+            val isAnyNormalSelected =
+                normalCards.any { it.isSelected }
+
+            val isNoneSelected =
+                btnNone.isSelected
+
+
+            btnNext.isEnabled =
+                isAnyNormalSelected || isNoneSelected
+
 
             for (card in normalCards) {
-                card.setTextColor(if (card.isSelected) Color.WHITE else Color.parseColor("#333333"))
+
+                card.setTextColor(
+                    if (card.isSelected)
+                        Color.WHITE
+                    else
+                        Color.parseColor("#333333")
+                )
             }
-            btnNone.setTextColor(if (btnNone.isSelected) Color.WHITE else Color.parseColor("#008000"))
+
+
+            btnNone.setTextColor(
+                if (btnNone.isSelected)
+                    Color.WHITE
+                else
+                    Color.parseColor("#008000")
+            )
         }
 
-        // 초기 진입 시 버튼 비활성화 상태 맞추기
-        updateState()
 
-        // 일반 취향 카드들 클릭 리스너
+        if (isEditMode) {
+
+            btnNext.text = "완료"
+
+            loadUserPreferences(
+                normalCards,
+                btnNone
+            )
+
+        } else {
+
+            updateState()
+        }
+
+
         for (card in normalCards) {
+
             card.setOnClickListener {
-                // 일반 카드를 누르면 None은 무조건 선택 해제됨
+
                 btnNone.isSelected = false
 
-                // 현재 카드의 선택 상태 토글
-                card.isSelected = !card.isSelected
+                card.isSelected =
+                    !card.isSelected
 
-                // 상태 업데이트 실행
                 updateState()
             }
         }
 
-        // None 버튼 클릭 리스너
+
         btnNone.setOnClickListener {
-            // None을 누르면 기존에 선택되어 있던 모든 일반 카드들의 선택을 취소함!
+
             for (card in normalCards) {
                 card.isSelected = false
             }
 
-            // None 자체의 선택 상태 토글
-            btnNone.isSelected = !btnNone.isSelected
+            btnNone.isSelected =
+                !btnNone.isSelected
 
-            // 상태 업데이트 실행
             updateState()
         }
 
-        // 하단 Next 버튼
+
+
         btnNext.setOnClickListener {
-            val userNickname = intent.getStringExtra("USER_NICKNAME") ?: "USER"
-            val userLanguage = intent.getStringExtra("USER_LANGUAGE") ?: "Korean"
+
+
+            val selectedPreferences =
+                ArrayList<String>()
+
 
             val preferenceKeyMap = mapOf(
                 R.id.btnHalal to "HALAL",
@@ -96,24 +159,189 @@ class Preference3Activity : AppCompatActivity() {
                 R.id.btnAlcoholFree to "ALCOHOL_FREE"
             )
 
-            val selectedPreferences = ArrayList<String>()
+
             for (card in normalCards) {
+
                 if (card.isSelected) {
+
                     preferenceKeyMap[card.id]?.let { key ->
                         selectedPreferences.add(key)
                     }
                 }
             }
+
+
             if (btnNone.isSelected) {
                 selectedPreferences.add("None")
             }
 
-            val intent = Intent(this, Preference4Activity::class.java).apply {
-                putExtra("USER_NICKNAME", userNickname)
-                putExtra("USER_LANGUAGE", userLanguage)
-                putStringArrayListExtra("USER_PREFERENCES", selectedPreferences)
+
+
+            if (isEditMode) {
+
+
+                updatePreferences(
+                    selectedPreferences
+                )
+
+
+            } else {
+
+
+                val userNickname =
+                    intent.getStringExtra("USER_NICKNAME")
+                        ?: "USER"
+
+
+                val userLanguage =
+                    intent.getStringExtra("USER_LANGUAGE")
+                        ?: "Korean"
+
+
+
+                val intent =
+                    Intent(
+                        this,
+                        Preference4Activity::class.java
+                    ).apply {
+
+                        putExtra(
+                            "USER_NICKNAME",
+                            userNickname
+                        )
+
+                        putExtra(
+                            "USER_LANGUAGE",
+                            userLanguage
+                        )
+
+                        putStringArrayListExtra(
+                            "USER_PREFERENCES",
+                            selectedPreferences
+                        )
+                    }
+
+
+                startActivity(intent)
             }
-            startActivity(intent)
         }
+    }
+
+
+
+    private fun loadUserPreferences(
+        normalCards: List<TextView>,
+        btnNone: TextView
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        db.collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+
+                val savedPreferences =
+                    document.get("preferences")
+                            as? List<String>
+                        ?: emptyList()
+
+
+
+                for (card in normalCards) {
+
+                    when (card.id) {
+
+                        R.id.btnHalal ->
+                            card.isSelected =
+                                savedPreferences.contains("HALAL")
+
+
+                        R.id.btnVegetarian ->
+                            card.isSelected =
+                                savedPreferences.contains("VEGETARIAN")
+
+
+                        R.id.btnVegan ->
+                            card.isSelected =
+                                savedPreferences.contains("VEGAN")
+
+
+                        R.id.btnMsgFree ->
+                            card.isSelected =
+                                savedPreferences.contains("MSG_FREE")
+
+
+                        R.id.btnGlutenFree ->
+                            card.isSelected =
+                                savedPreferences.contains("GLUTEN_FREE")
+
+
+                        R.id.btnPorkFree ->
+                            card.isSelected =
+                                savedPreferences.contains("PORK_FREE")
+
+
+                        R.id.btnAlcoholFree ->
+                            card.isSelected =
+                                savedPreferences.contains("ALCOHOL_FREE")
+                    }
+                }
+
+
+                btnNone.isSelected =
+                    savedPreferences.contains("None")
+
+
+
+                for (card in normalCards) {
+
+                    card.setTextColor(
+                        if (card.isSelected)
+                            Color.WHITE
+                        else
+                            Color.parseColor("#333333")
+                    )
+                }
+
+
+                btnNone.setTextColor(
+                    if (btnNone.isSelected)
+                        Color.WHITE
+                    else
+                        Color.parseColor("#008000")
+                )
+
+
+                findViewById<AppCompatButton>(R.id.btnNext)
+                    .isEnabled =
+                    savedPreferences.isNotEmpty()
+            }
+    }
+
+
+
+    private fun updatePreferences(
+        preferences: ArrayList<String>
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        db.collection("users")
+            .document(uid)
+            .update(
+                "preferences",
+                preferences
+            )
+            .addOnSuccessListener {
+
+                finish()
+
+            }
     }
 }
