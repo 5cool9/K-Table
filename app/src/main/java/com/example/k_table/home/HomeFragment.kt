@@ -80,10 +80,26 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         layoutLoading = view.findViewById(R.id.layoutLoading)
         layoutError = view.findViewById(R.id.layoutError)
 
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
+
+        recyclerView = view.findViewById(R.id.rvRestaurantList)
+
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext())
+
+        recyclerView.isNestedScrollingEnabled = false
+
+        adapter = RestaurantAdapter(restaurantList)
+
+        recyclerView.adapter = adapter
+
 
         if (restaurantList.isEmpty()) {
             startSearch("37.5665", "126.9780")
         }
+
+        setupTodayRecommend(view)
     }
 
     // 오늘의 추천 식당 슬라이드 ( 홍보 광고용 자리 , 지금은 더미 데이터 활용 )

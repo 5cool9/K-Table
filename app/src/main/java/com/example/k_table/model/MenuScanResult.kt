@@ -1,12 +1,16 @@
 package com.example.k_table.model
 
+import kotlinx.parcelize.Parcelize
+import android.os.Parcelable
+
 /**
  * 메뉴 하나의 적합도 상태
  * - SUITABLE   : 적합 (초록)
  * - CAUTION    : 주의 (주황)
  * - UNSUITABLE : 부적합 (빨강)
  */
-enum class SuitabilityStatus(val label: String) {
+@Parcelize
+enum class SuitabilityStatus(val label: String) : Parcelable {
     SUITABLE("적합"),
     CAUTION("주의"),
     UNSUITABLE("부적합")
@@ -24,11 +28,13 @@ enum class SuitabilityStatus(val label: String) {
  * @param questionKo   "사장님께 이렇게 물어보세요" 에 들어갈 한국어 질문 텍스트
  * @param isExpanded   현재 카드가 펼쳐진 상태인지
  */
+
+@Parcelize
 data class MenuScanResult(
-    val id: String,
+    val id: String = "",
     val koreanName: String,
     val englishName: String,
     val status: SuitabilityStatus,
     val questionKo: String? = null,
     val isExpanded: Boolean = false
-)
+) : Parcelable
