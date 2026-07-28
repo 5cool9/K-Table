@@ -11,6 +11,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import com.example.k_table.R
 import com.example.k_table.RestaurantAdapter
 import com.example.k_table.api.RetrofitClient
@@ -35,6 +38,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import android.os.Handler
 
 
 data class UserDietProfile(
@@ -53,6 +57,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var layoutError: LinearLayout
     private lateinit var locationCallback: LocationCallback
     private var isSearching = false
+    private lateinit var viewPagerToday: ViewPager2
+    private val autoScrollHandler = Handler(Looper.getMainLooper())
+    private var autoScrollRunnable: Runnable? = null
 
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -88,8 +95,107 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             requestLocationPermissionAndSearch()
         }
 
+        setupTodayRecommend(view)
+
         // 홈 화면 진입 시 서울 기본 좌표로 자동 추천 시작
         startSearch("37.5665", "126.9780")
+    }
+
+    // 오늘의 추천 식당 슬라이드 ( 홍보 광고용 자리 , 지금은 더미 데이터 활용 )
+    private fun setupTodayRecommend(view: View) {
+
+        viewPagerToday = view.findViewById(R.id.viewPagerToday)
+
+
+        val restaurantSets = listOf(
+
+            TodayRecommend(
+                images = listOf(
+                    R.drawable.namul_1,
+                    R.drawable.namul_2,
+                    R.drawable.namul_3
+                ),
+                title = "비빔밥 전문점 '나물담'",
+                description = "신선한 채소와 다양한 나물을 사용한 건강한 한식당입니다."
+            ),
+
+
+            TodayRecommend(
+                images = listOf(
+                    R.drawable.jamil_1,
+                    R.drawable.jamil_2,
+                    R.drawable.jamil_3
+                ),
+                title = "할랄 전문점 '자밀 브로스'",
+                description = "신선한 재료로 만든 든든한 할랄 랩을 맛볼 수 있어요."
+            )
+        )
+
+
+        val selectedRestaurant = restaurantSets.random()
+
+
+        val density = resources.displayMetrics.density
+        val peekPx = (32 * density).toInt()
+        val marginPx = (12 * density).toInt()
+
+
+        viewPagerToday.apply {
+
+            adapter =
+                TodayRecommendAdapter(
+                    selectedRestaurant.images,
+                    selectedRestaurant.title,
+                    selectedRestaurant.description
+                )
+
+            offscreenPageLimit = 3
+
+            clipToPadding = false
+            clipChildren = false
+
+            setPadding(
+                peekPx,
+                0,
+                peekPx,
+                0
+            )
+
+            val transformer =
+                CompositePageTransformer()
+
+            transformer.addTransformer(
+                MarginPageTransformer(marginPx)
+            )
+
+            setPageTransformer(transformer)
+
+            post {
+                currentItem =
+                    (0 until selectedRestaurant.images.size).random()
+            }
+        }
+
+
+        startAutoScroll(
+            selectedRestaurant.images.size
+        )
+    }
+
+    // 5초마다 자동으로 다음 페이지로 넘어가도록 처리
+    private fun startAutoScroll(itemCount: Int) {
+        autoScrollRunnable = Runnable {
+            val nextItem = (viewPagerToday.currentItem + 1) % itemCount
+            viewPagerToday.setCurrentItem(nextItem, true)
+            autoScrollHandler.postDelayed(autoScrollRunnable!!, 5000)
+        }
+        autoScrollHandler.postDelayed(autoScrollRunnable!!, 5000)
+    }
+
+    // 화면 벗어날 때 자동 슬라이드 타이머 정리 (메모리 누수 방지)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        autoScrollRunnable?.let { autoScrollHandler.removeCallbacks(it) }
     }
 
     // 위치 버튼 클릭 시 권한 체크 후 분기
@@ -579,4 +685,6 @@ $restaurantData
             null
         }
     }
+
+
 }

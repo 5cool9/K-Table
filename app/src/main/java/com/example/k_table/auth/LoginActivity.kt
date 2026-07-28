@@ -12,6 +12,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.GetCredentialInterruptedException
+import androidx.credentials.exceptions.GetCredentialProviderConfigurationException
+import androidx.credentials.exceptions.NoCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
     private fun signInWithGoogle() {
 
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
+            .setFilterByAuthorizedAccounts(true)
             .setServerClientId("625773282373-9f1k3nhr1ctamjj79ppmbof9cjni1oqs.apps.googleusercontent.com")
             .build()
 
@@ -81,10 +86,8 @@ class LoginActivity : AppCompatActivity() {
                     .createFrom(credential.data)
 
                 val firebaseCredential = GoogleAuthProvider
-                    .getCredential(
-                        googleCredential.idToken,
-                        null
-                    )
+                    .getCredential(googleCredential.idToken, null)
+
 
                 firebaseAuth.signInWithCredential(firebaseCredential)
                     .addOnCompleteListener { task ->
@@ -94,31 +97,63 @@ class LoginActivity : AppCompatActivity() {
                             checkUserProfile()
 
                         } else {
-                            println("Firebase 로그인 실패: ${task.exception}")
-
+                            Log.e("GOOGLE_LOGIN_ERROR", "Firebase 인증 실패: ${task.exception}")
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "로그인에 실패했습니다. 다시 시도해주세요.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
 
-            } catch (e: Exception) {
-                Log.e("GOOGLE_LOGIN_ERROR", e.message.toString())
+            } catch (e: NoCredentialException) {
+                // 진짜로 기기에 등록된 Google 계정이 없는 경우에만 계정 추가 화면으로 이동
+                Log.e("GOOGLE_LOGIN_ERROR", "계정 없음: ${e.message}")
 
                 Toast.makeText(
                     this@LoginActivity,
-                    "등록된 Google 계정이 없습니다. 계정을 추가후 다시 시작해주세요.",
+                    "Google 로그인 정보를 가져올 수 없습니다. 계정 등록 또는 Google 서비스 상태를 확인해주세요.",
                     Toast.LENGTH_SHORT
                 ).show()
 
+            } catch (e: GetCredentialCancellationException) {
+                Log.d("GOOGLE_LOGIN_CANCEL", "사용자가 로그인을 취소함")
 
-                val intent = Intent(
-                    android.provider.Settings.ACTION_ADD_ACCOUNT
-                )
+            } catch (e: GetCredentialInterruptedException) {
+                // 일시적인 통신 중단일 경우
+                Log.e("GOOGLE_LOGIN_ERROR", "일시적 오류: ${e.message}")
+                Toast.makeText(
+                    this@LoginActivity,
+                    "일시적인 오류가 발생했습니다. 다시 시도해주세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                intent.putExtra(
-                    android.provider.Settings.EXTRA_ACCOUNT_TYPES,
-                    arrayOf("com.google")
-                )
+            } catch (e: GetCredentialProviderConfigurationException) {
+                // 기기 설정 자체에 문제가 있는 경우
+                Log.e("GOOGLE_LOGIN_ERROR", "Provider 설정 오류: ${e.message}")
+                Toast.makeText(
+                    this@LoginActivity,
+                    "이 기기에서 Google 로그인을 사용할 수 없습니다. Play 스토어 업데이트를 확인해주세요.",
+                    Toast.LENGTH_LONG
+                ).show()
 
-                startActivity(intent)
+            } catch (e: GetCredentialException) {
+                // 위에서 못 잡은 나머지 Credential 관련 예외
+                Log.e("GOOGLE_LOGIN_ERROR", "타입: ${e.javaClass.simpleName}, 메시지: ${e.message}")
+                Toast.makeText(
+                    this@LoginActivity,
+                    "로그인 중 오류가 발생했습니다. (${e.javaClass.simpleName})",
+                    Toast.LENGTH_LONG
+                ).show()
+
+            } catch (e: Exception) {
+                // 네트워크 등의 오류
+                Log.e("GOOGLE_LOGIN_ERROR", "알 수 없는 오류: ${e.javaClass.simpleName}, ${e.message}")
+                Toast.makeText(
+                    this@LoginActivity,
+                    "알 수 없는 오류가 발생했습니다.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
