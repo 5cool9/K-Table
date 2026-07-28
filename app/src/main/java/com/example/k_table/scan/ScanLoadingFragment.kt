@@ -27,9 +27,13 @@ import android.util.Base64
 import android.util.Log
 import com.example.k_table.api.GeminiRetrofitClient
 import com.example.k_table.BuildConfig
+import com.example.k_table.model.MenuScanResult
+import com.example.k_table.model.SuitabilityStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
 
 class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 
@@ -80,29 +84,13 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
             // 화면에 이미지 표시
             resultImage.setImageURI(uri)
 
-            // 메뉴 분석 시작
-            /*CoroutineScope(Dispatchers.IO).launch {
-
-                analyzeMenu(uri)
-
-            }*/
-
-            handler.postDelayed({
-
-                val intent = Intent(
-                    requireContext(),
-                    ScanResultActivity::class.java
-                )
-
-                startActivity(intent)
-
-            }, 2000)
-        }
+                CoroutineScope(Dispatchers.IO).launch {
+                    analyzeMenu(uri)
+                }
+            }
 
         startScanAnimation()
-
     }
-
 
     private fun startScanAnimation(){
 
@@ -206,10 +194,18 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 
         val prompt = """
 이 이미지는 음식점 메뉴판이다.
-메뉴 이름만 추출해라.
-가격은 제외.
-설명은 제외.
-JSON 배열만 출력한다.
+음식 메뉴 이름만 추출해라.
+
+규칙:
+- 음식, 식사, 반찬, 디저트 메뉴만 포함한다.
+- 음료 메뉴는 제외한다.
+- 커피, 차, 콜라, 사이다, 주스, 음료, 주류, 물 등은 제외한다.
+- 가격은 제외한다.
+- 설명 문구는 제외한다.
+- 메뉴명만 배열로 반환한다.
+- JSON 배열만 출력한다.
+- 절대 ```json 같은 코드블록을 사용하지 않는다.
+
 예시
 
 [
@@ -254,7 +250,7 @@ JSON 배열만 출력한다.
 
         if(response.isSuccessful){
 
-            val result =
+            val menuText =
                 response.body()
                     ?.candidates
                     ?.firstOrNull()
@@ -263,12 +259,52 @@ JSON 배열만 출력한다.
                     ?.firstOrNull()
                     ?.text
 
-            Log.d("MENU_RESULT", result ?: "null")
-        }else{
+            Log.d("MENU_RESULT", menuText ?: "null")
+
+
+            val menuList = ArrayList<MenuScanResult>()
+
+            menuText?.let {
+
+                val jsonArray = JSONArray(it)
+
+                for (i in 0 until jsonArray.length()) {
+
+                    val menuName = jsonArray.getString(i)
+
+                    menuList.add(
+                        MenuScanResult(
+                            id = i.toString(),
+                            koreanName = menuName,
+                            englishName = "",
+                            status = SuitabilityStatus.CAUTION
+                        )
+                    )
+                }
+            }
+
+
+            withContext(Dispatchers.Main) {
+
+                val intent = Intent(
+                    requireContext(),
+                    ScanResultActivity::class.java
+                )
+
+                intent.putParcelableArrayListExtra(
+                    "scanResult",
+                    menuList
+                )
+
+                startActivity(intent)
+            }
+
+        } else{
             Log.e(
                 "MENU_RESULT",
                 "code=${response.code()} body=${response.errorBody()?.string()}"
             )
         }
+
     }
 }
