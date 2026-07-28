@@ -5,6 +5,7 @@ import InlineData
 import VisionContent
 import VisionPart
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -80,11 +81,22 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
             resultImage.setImageURI(uri)
 
             // 메뉴 분석 시작
-            CoroutineScope(Dispatchers.IO).launch {
+            /*CoroutineScope(Dispatchers.IO).launch {
 
                 analyzeMenu(uri)
 
-            }
+            }*/
+
+            handler.postDelayed({
+
+                val intent = Intent(
+                    requireContext(),
+                    ScanResultActivity::class.java
+                )
+
+                startActivity(intent)
+
+            }, 2000)
         }
 
         startScanAnimation()

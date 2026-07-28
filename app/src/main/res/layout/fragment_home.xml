@@ -89,8 +89,28 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerToday"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvTodayTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="24dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212529" />
+
+            <TextView
+                android:id="@+id/tvTodayDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:textSize="14sp"
+                android:textColor="#7A7A7A" />
 
             <!-- 프로모션 배너 -->
             <ImageView
@@ -125,6 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"/>

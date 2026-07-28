@@ -59,6 +59,10 @@
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".scan.ScanResultActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
