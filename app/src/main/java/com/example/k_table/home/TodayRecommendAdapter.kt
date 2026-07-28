@@ -10,8 +10,6 @@ import com.example.k_table.R
 
 class TodayRecommendAdapter(
     private val images: List<Int>,
-    private val title: String,
-    private val description: String
 ) : RecyclerView.Adapter<TodayRecommendAdapter.ViewHolder>() {
 
 
@@ -23,11 +21,6 @@ class TodayRecommendAdapter(
         val tvIndicator: TextView =
             view.findViewById(R.id.tvPageIndicator)
 
-        val tvTitle: TextView =
-            view.findViewById(R.id.tvSlideTitle)
-
-        val tvDesc: TextView =
-            view.findViewById(R.id.tvSlideDesc)
     }
 
 
@@ -59,11 +52,6 @@ class TodayRecommendAdapter(
         holder.tvIndicator.text =
             "${position + 1}/${images.size}"
 
-        holder.tvTitle.text =
-            title
-
-        holder.tvDesc.text =
-            description
     }
 
 

@@ -39,6 +39,7 @@ import com.google.android.gms.location.Priority
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import android.os.Handler
+import android.widget.TextView
 
 
 data class UserDietProfile(
@@ -79,26 +80,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         layoutLoading = view.findViewById(R.id.layoutLoading)
         layoutError = view.findViewById(R.id.layoutError)
 
-        fusedLocationClient =
-            LocationServices.getFusedLocationProviderClient(requireContext())
 
-        recyclerView = view.findViewById(R.id.rvRestaurantList)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = RestaurantAdapter(restaurantList)
-        recyclerView.adapter = adapter
-
-        val btnLocation = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLocation)
-        btnLocation.setOnClickListener {
-            if (isSearching) {
-                return@setOnClickListener
-            }
-            requestLocationPermissionAndSearch()
+        if (restaurantList.isEmpty()) {
+            startSearch("37.5665", "126.9780")
         }
-
-        setupTodayRecommend(view)
-
-        // 홈 화면 진입 시 서울 기본 좌표로 자동 추천 시작
-        startSearch("37.5665", "126.9780")
     }
 
     // 오늘의 추천 식당 슬라이드 ( 홍보 광고용 자리 , 지금은 더미 데이터 활용 )
@@ -136,17 +121,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
         val density = resources.displayMetrics.density
-        val peekPx = (32 * density).toInt()
+        val peekPx = (24 * density).toInt()
         val marginPx = (12 * density).toInt()
 
+        val tvTitle = view.findViewById<TextView>(R.id.tvTodayTitle)
+        val tvDesc = view.findViewById<TextView>(R.id.tvTodayDesc)
+
+        tvTitle.text = selectedRestaurant.title
+        tvDesc.text = selectedRestaurant.description
 
         viewPagerToday.apply {
 
             adapter =
                 TodayRecommendAdapter(
-                    selectedRestaurant.images,
-                    selectedRestaurant.title,
-                    selectedRestaurant.description
+                    selectedRestaurant.images
                 )
 
             offscreenPageLimit = 3
@@ -254,7 +242,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         "사용자 위치 사용 : ${location.latitude} / ${location.longitude}"
                     )
 
-                    startSearch(
+                    this@HomeFragment.startSearch(
                         location.latitude.toString(),
                         location.longitude.toString()
                     )

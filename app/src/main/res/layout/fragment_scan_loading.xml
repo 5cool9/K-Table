@@ -48,13 +48,13 @@
         android:id="@+id/tvSub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:text="음식을 스캔하고 있습니다."
-        android:textSize="14sp"
         android:textColor="#D1D1D6"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="6dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/scanFrame"

@@ -7,7 +7,7 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import com.example.k_table.home.HomeFragment
 import com.example.k_table.scan.ScanFragment
-import com.example.k_table.mypage.MyPageFragment
+import com.example.k_table.MyPageFragment
 
 class MainActivity : AppCompatActivity() {
 

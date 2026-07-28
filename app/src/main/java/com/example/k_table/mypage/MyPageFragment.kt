@@ -4,38 +4,50 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import android.view.View
 
-class MainActivity : AppCompatActivity() {
+class MyPageFragment : Fragment(R.layout.fragment_mypage) {
 
     private lateinit var btnEdit: MaterialButton
     private lateinit var btnLogout: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // XML 파일명이 fragment_mypage.xml이라면 맞음
-        setContentView(R.layout.fragment_mypage)
 
-        btnEdit = findViewById(R.id.btnEdit)
-        btnLogout = findViewById(R.id.btnLogout)
+        btnEdit = view.findViewById(R.id.btnEdit)
+        btnLogout = view.findViewById(R.id.btnLogout)
 
-        // 프로필 편집
+
         btnEdit.setOnClickListener {
-            Toast.makeText(this, "프로필 편집 화면", Toast.LENGTH_SHORT).show()
 
-            // 나중에 EditProfileActivity 만들면
-            // startActivity(Intent(this, EditProfileActivity::class.java))
+            Toast.makeText(
+                requireContext(),
+                "프로필 편집 화면",
+                Toast.LENGTH_SHORT
+            ).show()
+
         }
 
-        // 로그아웃
-        btnLogout.setOnClickListener {
-            Toast.makeText(this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
 
-            val intent = Intent(this, LoginActivity::class.java)
+        btnLogout.setOnClickListener {
+
+            Toast.makeText(
+                requireContext(),
+                "로그아웃 되었습니다.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+
+            val intent =
+                Intent(requireContext(), LoginActivity::class.java)
+
             startActivity(intent)
-            finish()
+
+            requireActivity().finish()
+
         }
     }
 }

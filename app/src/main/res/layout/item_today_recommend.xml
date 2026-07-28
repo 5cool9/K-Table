@@ -39,22 +39,4 @@
         </FrameLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/tvSlideTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textColor="#2D2F34"
-        android:textSize="18sp"
-        tools:text="비빔밥 전문점 '나물담'" />
-
-    <TextView
-        android:id="@+id/tvSlideDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="#7A7A7A"
-        android:textSize="11sp"
-        tools:text="신선한 채소와 다양한 나물을 사용한 건강한 한식당입니다." />
-
 </LinearLayout>
