@@ -67,6 +67,14 @@
         <activity android:name=".scan.ScanErrorActivity" />
         <activity android:name=".scan.NetworkErrorActivity" />
 
+        <activity
+            android:name=".auth.EmailLoginActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".auth.SignupActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

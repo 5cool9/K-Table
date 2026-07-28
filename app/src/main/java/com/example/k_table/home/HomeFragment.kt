@@ -175,8 +175,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             setPageTransformer(transformer)
 
             post {
-                currentItem =
-                    (0 until selectedRestaurant.images.size).random()
+                setCurrentItem(0, false)
             }
         }
 
