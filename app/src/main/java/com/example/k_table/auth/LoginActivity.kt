@@ -17,6 +17,8 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialInterruptedException
 import androidx.credentials.exceptions.GetCredentialProviderConfigurationException
 import androidx.credentials.exceptions.NoCredentialException
+import com.example.k_table.auth.EmailLoginActivity
+import com.example.k_table.auth.SignupActivity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +39,13 @@ class LoginActivity : AppCompatActivity() {
         // 이메일 로그인 버튼 클릭 시
         val btnEmailLogin = findViewById<Button>(R.id.btnEmailLogin)
         btnEmailLogin.setOnClickListener {
-            navigateToMain()
+
+            val intent = Intent(
+                this,
+                EmailLoginActivity::class.java
+            )
+
+            startActivity(intent)
         }
 
         // 구글 로그인 버튼 클릭 시
@@ -47,10 +55,16 @@ class LoginActivity : AppCompatActivity() {
             signInWithGoogle()
         }
 
-        // 회원가입 버튼 클릭 시
         val tvSignUp = findViewById<TextView>(R.id.tvSignUp)
+        // 회원가입 버튼 클릭 시
         tvSignUp.setOnClickListener {
-            // TODO: 회원가입 화면으로 이동하는 코드 작성 예정
+
+            val intent = Intent(
+                this,
+                SignupActivity::class.java
+            )
+
+            startActivity(intent)
         }
     }
 
@@ -107,7 +121,7 @@ class LoginActivity : AppCompatActivity() {
                     }
 
             } catch (e: NoCredentialException) {
-                // 진짜로 기기에 등록된 Google 계정이 없는 경우에만 계정 추가 화면으로 이동
+
                 Log.e("GOOGLE_LOGIN_ERROR", "계정 없음: ${e.message}")
 
                 Toast.makeText(

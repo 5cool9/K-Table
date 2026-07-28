@@ -14,7 +14,6 @@ class Preference3Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference_3)
 
-        // 뒤로 가기 버튼
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack.setOnClickListener {
             finish()
@@ -23,7 +22,7 @@ class Preference3Activity : AppCompatActivity() {
         val btnNone = findViewById<TextView>(R.id.btnNone)
         val btnNext = findViewById<AppCompatButton>(R.id.btnNext)
 
-        // 일반 취향 카드들 목록 (None 제외)
+        // 일반 취향 카드들 목록
         val normalCards = listOf(
             findViewById<TextView>(R.id.btnHalal),
             findViewById<TextView>(R.id.btnVegetarian),
@@ -34,20 +33,17 @@ class Preference3Activity : AppCompatActivity() {
             findViewById<TextView>(R.id.btnAlcoholFree)
         )
 
-        // 모든 카드(일반 + None)를 합친 전체 목록
         val allCards = normalCards + btnNone
 
-        // 🌟 선택 상태를 체크하고 Next 버튼 활성화/비활성화 및 텍스트 색상을 일괄 업데이트하는 함수
+        //선택 상태를 체크하고 Next 버튼 활성화/비활성화 및 텍스트 색상을 일괄 업데이트하는 함수
         fun updateState() {
             // 일반 카드 중 하나라도 선택되었는지 확인
             val isAnyNormalSelected = normalCards.any { it.isSelected }
             // None이 선택되었는지 확인
             val isNoneSelected = btnNone.isSelected
 
-            // 1. Next 버튼은 일반 카드나 None 중 최소 1개 이상 선택되어야 활성화
             btnNext.isEnabled = isAnyNormalSelected || isNoneSelected
 
-            // 2. 각 카드들의 글자 색상 동기화 (선택되면 흰색, 아니면 원래 색상)
             for (card in normalCards) {
                 card.setTextColor(if (card.isSelected) Color.WHITE else Color.parseColor("#333333"))
             }
