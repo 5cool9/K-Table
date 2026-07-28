@@ -29,4 +29,12 @@
         <item name="android:textColor">#5B5A5A</item>
         <item name="android:fontFamily">bold</item>
     </style>
+
+    <style name="MypageCardShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
 </resources>

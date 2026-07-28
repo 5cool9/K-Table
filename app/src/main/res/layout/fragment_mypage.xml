@@ -16,13 +16,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
     <ImageView
         android:id="@+id/imgLogo"
-        android:layout_width="183dp"
-        android:layout_height="53dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="80dp"
+        android:layout_width="143dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="72dp"
         android:src="@drawable/mypage_logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,7 +30,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="135dp"
-        app:cardCornerRadius="30dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:shapeAppearanceOverlay="@style/MypageCardShape"
         app:cardElevation="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -48,6 +48,7 @@
                 android:orientation="vertical">
 
                 <!-- 프로필 -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="110dp"
@@ -56,15 +57,15 @@
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/imgProfile"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:src="@drawable/mypage_profile"
-                        android:scaleType="centerCrop"/>
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/mypage_profile" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="30dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -73,9 +74,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Aishaa_22"
-                            android:textColor="#222222"
-                            android:textStyle="bold"
-                            android:textSize="20sp"/>
+                            android:textColor="#2D2F34"
+                            android:textSize="26sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/txtEmail"
@@ -83,61 +84,67 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:text="aishaa22@gmail.com"
-                            android:textColor="#8A8A8A"
-                            android:textSize="14sp"/>
+                            android:textColor="#999999"
+                            android:textSize="12sp" />
 
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEdit"
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp"
+                        android:layout_height="28dp"
+                        android:layout_marginRight="10dp"
+                        android:insetLeft="0dp"
                         android:insetTop="0dp"
+                        android:insetRight="0dp"
                         android:insetBottom="0dp"
                         android:minWidth="0dp"
                         android:minHeight="0dp"
-
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
                         android:text="프로필 편집"
                         android:textAllCaps="false"
-
                         android:textColor="@android:color/white"
                         android:textSize="10sp"
                         app:backgroundTint="#028334"
-                        app:cornerRadius="20dp" />
+                        app:cornerRadius="16dp" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:background="#F5F5F5"/>
+                    android:layout_height="1dp"
+                    android:background="#E5E5EA"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="22dp"
+                    android:layout_marginTop="35dp"
                     android:text="개인 설정"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="20sp"
+                    android:textColor="#0F0F0F"/>
 
                 <!-- 식단 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="24dp">
+                    android:paddingHorizontal="24dp"
+                    android:layout_marginTop="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="식단 &amp; 알러지 설정"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:text="›"
-                        android:textSize="22sp"
-                        android:textColor="#BDBDBD"
+                        android:textSize="24sp"
+                        android:textColor="#000000"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -147,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginHorizontal="20dp"
-                    android:background="#ECECEC"/>
+                    android:background="#F2F2F2"/>
 
                 <!-- 선호 -->
                 <LinearLayout
@@ -161,12 +168,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="선호 설정"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:text="›"
-                        android:textSize="22sp"
-                        android:textColor="#BDBDBD"
+                        android:textSize="24sp"
+                        android:textColor="#000000"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
@@ -175,7 +183,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginHorizontal="20dp"
-                    android:background="#ECECEC"/>
+                    android:background="#F2F2F2"/>
 
                 <!-- 언어 -->
                 <LinearLayout
@@ -189,45 +197,49 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="언어"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="›"
-                        android:textColor="#BDBDBD"
-                        android:textSize="22sp"/>
+                        android:textColor="#000000"
+                        android:textSize="24sp"/>
 
                 </LinearLayout>
-
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:background="#F5F5F5"/>
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="20dp"
+                    android:background="#F2F2F2"/>
 
                 <!-- 지원 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="22dp"
+                    android:layout_marginTop="50dp"
                     android:text="지원"
                     android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="20sp"
+                    android:textColor="#0F0F0F"/>
 
                 <!-- 공지사항 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="24dp">
+                    android:paddingHorizontal="24dp"
+                    android:layout_marginTop="15dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="공지사항"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -242,7 +254,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginHorizontal="20dp"
-                    android:background="#ECECEC"/>
+                    android:background="#F2F2F2"/>
 
                 <!-- 고객센터 -->
                 <LinearLayout
@@ -256,7 +268,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="고객센터"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -271,7 +284,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginHorizontal="20dp"
-                    android:background="#ECECEC"/>
+                    android:background="#F2F2F2"/>
 
                 <!-- 이용약관 -->
                 <LinearLayout
@@ -285,7 +298,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="이용약관 · 개인정보"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -300,7 +314,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginHorizontal="20dp"
-                    android:background="#ECECEC"/>
+                    android:background="#F2F2F2"/>
 
                 <!-- 버전 -->
                 <LinearLayout
@@ -314,31 +328,29 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="버전"
-                        android:textSize="16sp"/>
+                        android:textSize="14sp"
+                        android:textColor="#0F0F0F"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="v1.0.0"
-                        android:textColor="#9E9E9E"
-                        android:textSize="14sp"/>
+                        android:textColor="#7A7A7A"
+                        android:textSize="12sp"/>
 
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="16dp"
-                    android:background="#F5F5F5"/>
 
                 <!-- 로그아웃 -->
                 <TextView
                     android:id="@+id/btnLogout"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
+                    android:layout_marginTop="25dp"
                     android:gravity="center"
                     android:text="로그아웃"
-                    android:textColor="#666666"
-                    android:textSize="15sp"/>
+                    android:textColor="#7A7A7A"
+                    android:textSize="12sp"/>
 
             </LinearLayout>
 
