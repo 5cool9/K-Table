@@ -6,49 +6,198 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.doAfterTextChanged
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class Preference2Activity : AppCompatActivity() {
+
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    private var isEditMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preference_2)
 
+        isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
+
+        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+
+        if (isEditMode) {
+
+            tvTitle.text = "언어 설정"
+        }
+
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val btnNext = findViewById<AppCompatButton>(R.id.btnNext)
         val etNickname = findViewById<EditText>(R.id.etNickname)
 
-        // 드롭다운에 들어갈 언어 데이터 설정
         val languages = arrayOf("Korean", "English")
         val spinner = findViewById<Spinner>(R.id.spinnerLanguage)
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, languages)
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            languages
+        )
+
         spinner.adapter = adapter
 
-        // 처음 화면에 들어왔을 때는 닉네임이 비어있으므로 버튼 비활성화
-        btnNext.isEnabled = false
 
-        etNickname.doAfterTextChanged { text ->
-            val nickname = text.toString().trim()
-            // 글자가 있으면 활성화, 없으면 비활성화
-            btnNext.isEnabled = nickname.isNotEmpty()
+        if (isEditMode) {
+
+            btnNext.text = "완료"
+
+            loadUserInfo(
+                etNickname,
+                spinner
+            )
+
+        } else {
+
+            btnNext.isEnabled = false
         }
 
-        // 상단 뒤로 가기 버튼 클릭 시
+
+        etNickname.doAfterTextChanged {
+
+            btnNext.isEnabled =
+                etNickname.text.toString().trim().isNotEmpty()
+
+        }
+
+
         btnBack.setOnClickListener {
-            finish()
+
+            if (isEditMode) {
+
+                val intent =
+                    Intent(this, MainActivity::class.java)
+
+                intent.putExtra(
+                    "OPEN_MYPAGE",
+                    true
+                )
+                startActivity(intent)
+
+                finish()
+
+            } else {
+
+                finish()
+            }
         }
+
 
         btnNext.setOnClickListener {
-            val userNickname = etNickname.text.toString().trim()
-            val userLanguage = spinner.selectedItem.toString()
 
-            val intent = Intent(this, Preference3Activity::class.java).apply {
-                putExtra("USER_NICKNAME", userNickname)
-                putExtra("USER_LANGUAGE", userLanguage)
+            val userNickname =
+                etNickname.text.toString().trim()
+
+            val userLanguage =
+                spinner.selectedItem.toString()
+
+
+            if (isEditMode) {
+
+                updateUserInfo(
+                    userNickname,
+                    userLanguage
+                )
+
+            } else {
+
+                val intent =
+                    Intent(
+                        this,
+                        Preference3Activity::class.java
+                    ).apply {
+
+                        putExtra(
+                            "USER_NICKNAME",
+                            userNickname
+                        )
+
+                        putExtra(
+                            "USER_LANGUAGE",
+                            userLanguage
+                        )
+                    }
+
+                startActivity(intent)
             }
-            startActivity(intent)
         }
+    }
+
+
+    private fun loadUserInfo(
+        etNickname: EditText,
+        spinner: Spinner
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        db.collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+                if (document.exists()) {
+
+                    val nickname =
+                        document.getString("nickname") ?: ""
+
+                    val language =
+                        document.getString("language")
+                            ?: "Korean"
+
+
+                    etNickname.setText(nickname)
+
+
+                    val index =
+                        if (language == "English") 1 else 0
+
+
+                    spinner.setSelection(index)
+
+
+                    findViewById<AppCompatButton>(R.id.btnNext)
+                        .isEnabled = true
+                }
+            }
+    }
+
+
+    private fun updateUserInfo(
+        nickname: String,
+        language: String
+    ) {
+
+        val uid =
+            auth.currentUser?.uid ?: return
+
+
+        val updateData = hashMapOf(
+            "nickname" to nickname,
+            "language" to language
+        )
+
+
+        db.collection("users")
+            .document(uid)
+            .update(updateData as Map<String, Any>)
+            .addOnSuccessListener {
+
+                finish()
+
+            }
     }
 }

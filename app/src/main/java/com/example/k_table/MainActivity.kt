@@ -29,10 +29,25 @@ class MainActivity : AppCompatActivity() {
                 "openScan",
                 false
             )
+
+        val openMyPage =
+            intent.getBooleanExtra(
+                "OPEN_MYPAGE",
+                false
+            )
+
         if(openScan){
+
             changeFragment(
                 ScanFragment()
             )
+
+        }else if(openMyPage){
+
+            changeFragment(
+                MyPageFragment()
+            )
+
         }else{
 
             changeFragment(
