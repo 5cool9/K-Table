@@ -193,8 +193,14 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
         val base64 = bitmapToBase64(bitmap)
 
         val prompt = """
-이 이미지는 음식점 메뉴판이다.
-음식 메뉴 이름만 추출해라.
+이 이미지가 음식점 메뉴판인지 먼저 판단해라.
+
+만약 음식점 메뉴판이 아니면 반드시 빈 JSON 배열만 반환한다.
+
+예:
+[]
+
+음식점 메뉴판인 경우에만 음식 메뉴 이름을 추출한다.
 
 규칙:
 - 음식, 식사, 반찬, 디저트 메뉴만 포함한다.
@@ -250,60 +256,103 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 
         if(response.isSuccessful){
 
-            val menuText =
-                response.body()
-                    ?.candidates
-                    ?.firstOrNull()
-                    ?.content
-                    ?.parts
-                    ?.firstOrNull()
-                    ?.text
+            try {
 
-            Log.d("MENU_RESULT", menuText ?: "null")
+                val menuText =
+                    response.body()
+                        ?.candidates
+                        ?.firstOrNull()
+                        ?.content
+                        ?.parts
+                        ?.firstOrNull()
+                        ?.text
 
 
-            val menuList = ArrayList<MenuScanResult>()
+                Log.d("MENU_RESULT", menuText ?: "null")
 
-            menuText?.let {
 
-                val jsonArray = JSONArray(it)
+                val menuList = ArrayList<MenuScanResult>()
 
-                for (i in 0 until jsonArray.length()) {
 
-                    val menuName = jsonArray.getString(i)
+                menuText?.let {
 
-                    menuList.add(
-                        MenuScanResult(
-                            id = i.toString(),
-                            koreanName = menuName,
-                            englishName = "",
-                            status = SuitabilityStatus.CAUTION
+                    val jsonArray = JSONArray(it)
+
+                    for (i in 0 until jsonArray.length()) {
+
+                        val menuName = jsonArray.getString(i)
+
+                        menuList.add(
+                            MenuScanResult(
+                                id = i.toString(),
+                                koreanName = menuName,
+                                englishName = "",
+                                status = SuitabilityStatus.CAUTION
+                            )
                         )
-                    )
+                    }
                 }
+
+
+                withContext(Dispatchers.Main) {
+
+                    if(menuList.isEmpty()) {
+
+                        // 사진 분석 실패
+                        val intent = Intent(
+                            requireContext(),
+                            ScanErrorActivity::class.java
+                        )
+
+                        startActivity(intent)
+
+                    } else {
+
+                        // 정상 결과
+                        val intent = Intent(
+                            requireContext(),
+                            ScanResultActivity::class.java
+                        )
+
+                        intent.putParcelableArrayListExtra(
+                            "scanResult",
+                            menuList
+                        )
+
+                        startActivity(intent)
+
+                    }
+                }
+
+
+            } catch(e: Exception) {
+
+                // JSON 파싱 실패 = 사진 문제
+                withContext(Dispatchers.Main) {
+
+                    val intent = Intent(
+                        requireContext(),
+                        ScanErrorActivity::class.java
+                    )
+
+                    startActivity(intent)
+                }
+
             }
+        } else {
 
-
+            // Gemini 서버 오류 / 토큰 오류 / 네트워크 오류
             withContext(Dispatchers.Main) {
 
                 val intent = Intent(
                     requireContext(),
-                    ScanResultActivity::class.java
-                )
-
-                intent.putParcelableArrayListExtra(
-                    "scanResult",
-                    menuList
+                    NetworkErrorActivity::class.java
                 )
 
                 startActivity(intent)
-            }
 
-        } else{
-            Log.e(
-                "MENU_RESULT",
-                "code=${response.code()} body=${response.errorBody()?.string()}"
-            )
+
+            }
         }
 
     }

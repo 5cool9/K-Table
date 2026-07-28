@@ -63,6 +63,10 @@
         <activity
             android:name=".scan.ScanResultActivity"
             android:exported="false" />
+
+        <activity android:name=".scan.ScanErrorActivity" />
+        <activity android:name=".scan.NetworkErrorActivity" />
+
     </application>
 
 </manifest>

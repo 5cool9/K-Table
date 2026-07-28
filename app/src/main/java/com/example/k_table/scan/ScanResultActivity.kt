@@ -1,5 +1,6 @@
 package com.example.k_table.scan
 
+import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import com.example.k_table.api.GeminiRetrofitClient
 import com.example.k_table.BuildConfig
+import com.example.k_table.MainActivity
 import com.example.k_table.home.UserDietProfile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,7 +34,6 @@ class ScanResultActivity : AppCompatActivity() {
     private lateinit var tts: TextToSpeech
     private var fullList: List<MenuScanResult> = emptyList()
     private var scanMenus: ArrayList<MenuScanResult> = arrayListOf()
-    private var cachedUserProfile: UserDietProfile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,13 +46,31 @@ class ScanResultActivity : AppCompatActivity() {
             }
         }
 
-        adapter = ScanResultAdapter(tts)
+        adapter = ScanResultAdapter(
+            { question ->
+                speakQuestion(question)
+            }
+        )
+
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@ScanResultActivity)
             adapter = this@ScanResultActivity.adapter
         }
 
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+
+            val intent = Intent(
+                this,
+                MainActivity::class.java
+            )
+
+            intent.flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+            startActivity(intent)
+            finish()
+        }
 
         val result = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableArrayListExtra(
@@ -71,6 +90,23 @@ class ScanResultActivity : AppCompatActivity() {
         applyFilter(TabFilter.ALL)
 
         fetchUserProfileAndAnalyze(scanMenus)
+
+        binding.btnRescan.setOnClickListener {
+
+            val intent = Intent(
+                this,
+                MainActivity::class.java
+            )
+
+            intent.putExtra(
+                "openScan",
+                true
+            )
+
+            startActivity(intent)
+
+            finish()
+        }
     }
 
     private enum class TabFilter { ALL, SUITABLE, CAUTION, UNSUITABLE }
@@ -157,8 +193,7 @@ class ScanResultActivity : AppCompatActivity() {
         menus: List<MenuScanResult>,
         allergies: List<String>,
         preferences: List<String>
-    )
-    {
+    ) {
 
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -258,7 +293,6 @@ UNSUITABLE
                 )
             )
 
-
             val response =
                 GeminiRetrofitClient.api.generate(
                     apiKey = BuildConfig.GEMINI_SCAN_API_KEY,
@@ -283,26 +317,50 @@ UNSUITABLE
                     val geminiResult =
                         parseGeminiResult(it)
 
-                    if (geminiResult.isNotEmpty()) {
+                    runOnUiThread {
 
-                        runOnUiThread {
+                        if (geminiResult.isNotEmpty()) {
+
                             fullList = geminiResult
                             updateTabCounts()
                             applyFilter(TabFilter.ALL)
-                        }
 
+                        } else {
+
+                            moveToNetworkError()
+
+                        }
                     }
+
+                } ?: run {
+
+                    runOnUiThread {
+                        moveToNetworkError()
+                    }
+
                 }
 
             } else {
 
-                Log.e(
-                    "GEMINI_ANALYZE",
-                    "error=${response.code()}"
-                )
+                runOnUiThread {
+                    moveToNetworkError()
+                }
 
             }
         }
+
+    }
+
+    private fun moveToNetworkError(){
+
+        val intent = Intent(
+            this,
+            NetworkErrorActivity::class.java
+        )
+
+        startActivity(intent)
+        finish()
+
     }
     private fun parseGeminiResult(
         json: String
@@ -323,5 +381,19 @@ UNSUITABLE
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    private fun speakQuestion(question: String?) {
+
+        if (question.isNullOrEmpty()) {
+            return
+        }
+
+        tts.speak(
+            question,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            "question"
+        )
     }
 }
