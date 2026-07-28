@@ -1,10 +1,18 @@
 package com.example.k_table.scan
 
+import GeminiVisionRequest
+import InlineData
+import VisionContent
+import VisionPart
 import android.animation.ObjectAnimator
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
@@ -13,6 +21,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.example.k_table.R
+import java.io.ByteArrayOutputStream
+import android.util.Base64
+import android.util.Log
+import com.example.k_table.api.GeminiRetrofitClient
+import com.example.k_table.BuildConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 
@@ -57,22 +73,21 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
         val uriString = arguments?.getString("imageUri")
 
         uriString?.let {
-            resultImage.setImageURI(Uri.parse(it))
+
+            val uri = Uri.parse(it)
+
+            // 화면에 이미지 표시
+            resultImage.setImageURI(uri)
+
+            // 메뉴 분석 시작
+            CoroutineScope(Dispatchers.IO).launch {
+
+                analyzeMenu(uri)
+
+            }
         }
 
         startScanAnimation()
-
-        // 3초 후 결과 화면
-        handler.postDelayed({
-
-            parentFragmentManager.beginTransaction()
-                .replace(
-                    R.id.fragmentContainer,
-                    ScanResultFragment()
-                )
-                .commit()
-
-        }, 100000)
 
     }
 
@@ -126,4 +141,122 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
         handler.removeCallbacksAndMessages(null)
     }
 
+    private fun bitmapToBase64(bitmap: Bitmap): String {
+
+        val outputStream = ByteArrayOutputStream()
+
+        bitmap.compress(
+            Bitmap.CompressFormat.JPEG,
+            60,
+            outputStream
+        )
+
+        val imageBytes = outputStream.toByteArray()
+
+        Log.d(
+            "GEMINI_SCAN",
+            "image size=${imageBytes.size / 1024}KB, width=${bitmap.width}, height=${bitmap.height}"
+        )
+
+        return Base64.encodeToString(
+            outputStream.toByteArray(),
+            Base64.NO_WRAP
+        )
+    }
+
+    private fun uriToBitmap(uri: Uri): Bitmap {
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+
+            val source =
+                ImageDecoder.createSource(
+                    requireContext().contentResolver,
+                    uri
+                )
+
+            ImageDecoder.decodeBitmap(source)
+
+        } else {
+
+            MediaStore.Images.Media.getBitmap(
+                requireContext().contentResolver,
+                uri
+            )
+
+        }
+    }
+
+    private suspend fun analyzeMenu(uri: Uri) {
+
+        val bitmap = uriToBitmap(uri)
+
+        val base64 = bitmapToBase64(bitmap)
+
+        val prompt = """
+이 이미지는 음식점 메뉴판이다.
+메뉴 이름만 추출해라.
+가격은 제외.
+설명은 제외.
+JSON 배열만 출력한다.
+예시
+
+[
+ "김치찌개",
+ "된장찌개",
+ "비빔밥"
+]
+""".trimIndent()
+
+        val request = GeminiVisionRequest(
+
+            contents = listOf(
+
+                VisionContent(
+
+                    parts = listOf(
+
+                        VisionPart(text = prompt),
+
+                        VisionPart(
+
+                            inlineData = InlineData(
+                                mimeType = "image/jpeg",
+                                data = base64
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        Log.d("GEMINI_SCAN", "Vision 호출 시작")
+
+        val response =
+            GeminiRetrofitClient.api.generateVision(
+
+                apiKey = BuildConfig.GEMINI_SCAN_API_KEY,
+                request = request
+
+            )
+        Log.d("GEMINI_SCAN", "Vision 응답 코드: ${response.code()}")
+
+        if(response.isSuccessful){
+
+            val result =
+                response.body()
+                    ?.candidates
+                    ?.firstOrNull()
+                    ?.content
+                    ?.parts
+                    ?.firstOrNull()
+                    ?.text
+
+            Log.d("MENU_RESULT", result ?: "null")
+        }else{
+            Log.e(
+                "MENU_RESULT",
+                "code=${response.code()} body=${response.errorBody()?.string()}"
+            )
+        }
+    }
 }
