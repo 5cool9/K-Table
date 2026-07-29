@@ -1,5 +1,6 @@
 package com.example.k_table
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,24 @@ import com.example.k_table.MyPageFragment
 
 class MainActivity : AppCompatActivity() {
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        setIntent(intent)
+
+        val goHome = intent.getBooleanExtra(
+            "goHome",
+            false
+        )
+
+        if (goHome) {
+
+            changeFragment(
+                HomeFragment()
+            )
+
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
