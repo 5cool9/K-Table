@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
+import android.view.View
+import android.widget.LinearLayout
 import com.example.k_table.api.GeminiRetrofitClient
 import com.example.k_table.BuildConfig
 import com.example.k_table.MainActivity
@@ -34,11 +36,13 @@ class ScanResultActivity : AppCompatActivity() {
     private lateinit var tts: TextToSpeech
     private var fullList: List<MenuScanResult> = emptyList()
     private var scanMenus: ArrayList<MenuScanResult> = arrayListOf()
+    private lateinit var layoutLoading: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityScanResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        layoutLoading = binding.layoutLoading
 
         tts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) {
@@ -64,6 +68,11 @@ class ScanResultActivity : AppCompatActivity() {
                 MainActivity::class.java
             )
 
+            intent.putExtra(
+                "goHome",
+                true
+            )
+
             intent.flags =
                 Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -84,10 +93,13 @@ class ScanResultActivity : AppCompatActivity() {
 
         scanMenus = result ?: arrayListOf()
 
-        fullList = scanMenus
+        fullList = emptyList()
 
         setupTabs()
-        applyFilter(TabFilter.ALL)
+
+        binding.tabLayout.visibility = View.GONE
+
+        showLoading()
 
         fetchUserProfileAndAnalyze(scanMenus)
 
@@ -325,6 +337,8 @@ UNSUITABLE
                             updateTabCounts()
                             applyFilter(TabFilter.ALL)
 
+                            hideLoading()
+
                         } else {
 
                             moveToNetworkError()
@@ -395,5 +409,18 @@ UNSUITABLE
             null,
             "question"
         )
+    }
+
+    private fun showLoading() {
+
+        binding.recyclerView.visibility = View.GONE
+        layoutLoading.visibility = View.VISIBLE
+
+    }
+
+    private fun hideLoading() {
+        binding.recyclerView.visibility = View.VISIBLE
+        layoutLoading.visibility = View.GONE
+        binding.tabLayout.visibility = View.VISIBLE
     }
 }

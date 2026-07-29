@@ -205,8 +205,13 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 규칙:
 - 음식, 식사, 반찬, 디저트 메뉴만 포함한다.
 - 음료 메뉴는 제외한다.
-- 커피, 차, 콜라, 사이다, 주스, 음료, 주류, 물 등은 제외한다.
-- 가격은 제외한다.
+- 커피, 차, 콜라, 사이다, 주스, 음료, 주류, 물 등은 제외한다. 
+- 메뉴판에 가격이 ₩9000, 9,000원, 9000원 형태로 표시되어 있어도 숫자만 추출한다.
+- 가격이 없으면 빈 문자열 ""로 반환한다.
+- 가격은 반드시 문자열 숫자로 반환한다.
+예:
+"9000"
+"12000"
 - 설명 문구는 제외한다.
 - 메뉴명만 배열로 반환한다.
 - JSON 배열만 출력한다.
@@ -215,9 +220,14 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 예시
 
 [
- "김치찌개",
- "된장찌개",
- "비빔밥"
+ {
+   "name":"김치찌개",
+   "price":"9000"
+ },
+ {
+   "name":"된장찌개",
+   "price":"8000"
+ }
 ]
 """.trimIndent()
 
@@ -280,13 +290,17 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
 
                     for (i in 0 until jsonArray.length()) {
 
-                        val menuName = jsonArray.getString(i)
+                        val obj = jsonArray.getJSONObject(i)
+
+                        val menuName = obj.getString("name")
+                        val price = obj.getString("price")
 
                         menuList.add(
                             MenuScanResult(
                                 id = i.toString(),
                                 koreanName = menuName,
                                 englishName = "",
+                                price = price,
                                 status = SuitabilityStatus.CAUTION
                             )
                         )
@@ -320,6 +334,7 @@ class ScanLoadingFragment : Fragment(R.layout.fragment_scan_loading) {
                         )
 
                         startActivity(intent)
+                        requireActivity().finish()
 
                     }
                 }

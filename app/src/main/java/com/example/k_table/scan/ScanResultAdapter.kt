@@ -41,6 +41,14 @@ class ScanResultAdapter(
             binding.tvKoreanName.text = item.koreanName
             binding.tvEnglishName.text = item.englishName
 
+            binding.tvPrice.text =
+                if (!item.price.isNullOrEmpty()) {
+                    "${item.price}원"
+                } else {
+                    ""
+                }
+
+
             val colorRes = when (item.status) {
                 SuitabilityStatus.SUITABLE -> R.color.status_green
                 SuitabilityStatus.CAUTION -> R.color.status_orange

@@ -9,7 +9,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:padding="10dp"
         android:scaleType="fitCenter"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="스캔 결과"
-        android:textSize="17sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="@id/btnBack"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -77,6 +77,38 @@
         android:textSize="10sp"
         android:textColor="#212529"
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
+
+    <!-- 분석 로딩 화면 -->
+    <LinearLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvDisclaimer"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="메뉴를 분석하고 있어요"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="잠시만 기다려주세요"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
 
     <!-- 결과 카드 리스트 -->
     <androidx.recyclerview.widget.RecyclerView

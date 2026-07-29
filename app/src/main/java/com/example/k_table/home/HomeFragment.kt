@@ -44,6 +44,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import com.example.k_table.SearchRestaurantActivity
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
@@ -55,9 +56,15 @@ data class UserDietProfile(
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
+    private val prefs by lazy {
+        requireContext().getSharedPreferences(
+            "home_cache",
+            android.content.Context.MODE_PRIVATE
+        )
+    }
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RestaurantAdapter
-    private val restaurantList = mutableListOf<Restaurant>()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var cachedUserProfile: UserDietProfile? = null
     private lateinit var layoutLoading: LinearLayout
@@ -68,6 +75,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val autoScrollHandler = Handler(Looper.getMainLooper())
     private var autoScrollRunnable: Runnable? = null
     private lateinit var etSearch: EditText
+    private lateinit var tvUserRecommendTitle: TextView
+
+    companion object {
+        private val restaurantList = mutableListOf<Restaurant>()
+    }
 
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -85,6 +97,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        tvUserRecommendTitle =
+            view.findViewById(R.id.tvUserRecommendTitle)
 
         etSearch = view.findViewById(R.id.etSearch)
 
@@ -129,6 +144,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             requestLocationPermissionAndSearch()
         }
 
+        loadUserNickname()
+
         layoutLoading = view.findViewById(R.id.layoutLoading)
         layoutError = view.findViewById(R.id.layoutError)
 
@@ -148,9 +165,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         recyclerView.adapter = adapter
 
 
-        if (restaurantList.isEmpty()) {
-            startSearch("37.5665", "126.9780")
-        }
+        loadCachedRestaurants()
 
         setupTodayRecommend(view)
     }
@@ -658,32 +673,37 @@ $restaurantData
 
             Log.d("RESTAURANT_SIZE", "newList 개수 = ${newList.size}")
 
-            withContext(Dispatchers.Main) {
-                restaurantList.clear()
-                restaurantList.addAll(newList)
-
-                adapter.notifyDataSetChanged()
-
-                layoutLoading.visibility = View.GONE
-                layoutError.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
-
-                isSearching = false
-            }
 
             CoroutineScope(Dispatchers.IO).launch {
 
-                // 5개 이미지를 병렬로 먼저 다 가져온다
                 val imageUrls = newList.map { restaurant ->
-                    async { getRestaurantImageUrl(restaurant.name) }
+                    async {
+                        getRestaurantImageUrl(restaurant.name)
+                    }
                 }.awaitAll()
+
 
                 newList.forEachIndexed { index, restaurant ->
                     restaurant.imageUrl = imageUrls[index]
                 }
 
+
+                // 이미지까지 포함된 최종 데이터 저장
+                saveRestaurants(newList)
+
+
                 withContext(Dispatchers.Main) {
-                    adapter.notifyDataSetChanged()   // 다 모은 뒤 딱 한 번만 갱신
+
+                    restaurantList.clear()
+                    restaurantList.addAll(newList)
+
+                    adapter.notifyDataSetChanged()
+
+                    layoutLoading.visibility = View.GONE
+                    layoutError.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+
+                    isSearching = false
                 }
             }
 
@@ -752,5 +772,76 @@ $restaurantData
         }
     }
 
+    private fun loadUserNickname() {
 
+        val uid =
+            FirebaseAuth.getInstance()
+                .currentUser?.uid
+                ?: return
+
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+                val nickname =
+                    document.getString("nickname")
+
+
+                if(!nickname.isNullOrEmpty()) {
+
+                    tvUserRecommendTitle.text =
+                        "${nickname}님을 위한 추천 식당"
+
+                }
+            }
+    }
+    private fun saveRestaurants(list: List<Restaurant>) {
+
+        val json =
+            Gson().toJson(list)
+
+        prefs.edit()
+            .putString(
+                "restaurants",
+                json
+            )
+            .apply()
+    }
+
+    private fun loadCachedRestaurants() {
+
+        val json =
+            prefs.getString(
+                "restaurants",
+                null
+            )
+
+        if(json != null){
+
+            val cached =
+                Gson().fromJson(
+                    json,
+                    Array<Restaurant>::class.java
+                ).toList()
+
+
+            restaurantList.clear()
+            restaurantList.addAll(cached)
+
+            adapter.notifyDataSetChanged()
+
+            layoutLoading.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+
+        }else{
+
+            startSearch(
+                "37.5665",
+                "126.9780"
+            )
+        }
+    }
 }
