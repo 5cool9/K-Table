@@ -2,10 +2,8 @@ package com.example.k_table
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -37,25 +35,13 @@ class Preference2Activity : AppCompatActivity() {
         val btnNext = findViewById<AppCompatButton>(R.id.btnNext)
         val etNickname = findViewById<EditText>(R.id.etNickname)
 
-        val languages = arrayOf("Korean", "English")
-        val spinner = findViewById<Spinner>(R.id.spinnerLanguage)
-
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            languages
-        )
-
-        spinner.adapter = adapter
-
 
         if (isEditMode) {
 
             btnNext.text = "완료"
 
             loadUserInfo(
-                etNickname,
-                spinner
+                etNickname
             )
 
         } else {
@@ -99,9 +85,7 @@ class Preference2Activity : AppCompatActivity() {
             val userNickname =
                 etNickname.text.toString().trim()
 
-            val userLanguage =
-                spinner.selectedItem.toString()
-
+            val userLanguage = "Korean"
 
             if (isEditMode) {
 
@@ -136,8 +120,7 @@ class Preference2Activity : AppCompatActivity() {
 
 
     private fun loadUserInfo(
-        etNickname: EditText,
-        spinner: Spinner
+        etNickname: EditText
     ) {
 
         val uid =
@@ -154,19 +137,8 @@ class Preference2Activity : AppCompatActivity() {
                     val nickname =
                         document.getString("nickname") ?: ""
 
-                    val language =
-                        document.getString("language")
-                            ?: "Korean"
-
 
                     etNickname.setText(nickname)
-
-
-                    val index =
-                        if (language == "English") 1 else 0
-
-
-                    spinner.setSelection(index)
 
 
                     findViewById<AppCompatButton>(R.id.btnNext)

@@ -6,60 +6,60 @@
     </string>
 
     <!-- Sign Up 3/4 화면용 텍스트 리소스 -->
-    <string name="signup_step_3">Sign Up 3/4</string>
-    <string name="tell_us_about_you">Tell Us About You!</string>
-    <string name="personalize_subtitle">We\'ll personalize your experience based on your preferences.</string>
+    <string name="signup_step_3">회원가입 3/4</string>
+    <string name="tell_us_about_you">기본 정보를 입력해 주세요.</string>
+    <string name="personalize_subtitle">회원님의 선호도를 바탕으로 맞춤형 서비스를 제공\n합니다.</string>
 
     <!-- 식단 및 취향 선택지 -->
-    <string name="pref_halal">Halal</string>
-    <string name="pref_vegetarian">Vegetarian</string>
-    <string name="pref_vegan">Vegan</string>
-    <string name="pref_msg_free">MSG Free</string>
-    <string name="pref_gluten_free">Gluten Free</string>
-    <string name="pref_pork_free">Pork Free</string>
-    <string name="pref_alcohol_free">Alcohol Free</string>
-    <string name="pref_none">None</string>
+    <string name="pref_halal">할랄</string>
+    <string name="pref_vegetarian">채식</string>
+    <string name="pref_vegan">비건</string>
+    <string name="pref_msg_free">MSG 제외</string>
+    <string name="pref_gluten_free">글루텐 제외</string>
+    <string name="pref_pork_free">돼지고기 제외</string>
+    <string name="pref_alcohol_free">알코올 제외</string>
+    <string name="pref_none">해당 없음</string>
 
     <!-- 안내 및 버튼 -->
-    <string name="update_anytime">You can update this anytime in Settings.</string>
-    <string name="btn_next">Next</string>
+    <string name="update_anytime">설정에서 언제든지 변경할 수 있습니다.</string>
+    <string name="btn_next">다음</string>
 
     <!-- 4단계 알레르기 선택 화면용 텍스트 -->
-    <string name="signup_step_4">Sign Up 4/4</string>
-    <string name="allergy_subtitle">Select any foods you are allergic to.</string>
+    <string name="signup_step_4">회원가입 4/4</string>
+    <string name="allergy_subtitle">알레르기가 있는 식품을 모두 선택해 주세요.</string>
 
     <!-- 기본 알레르기 목록 -->
-    <string name="allergy_peanuts">Peanuts</string>
-    <string name="allergy_tree_nuts">Tree Nuts</string>
-    <string name="allergy_milk">Milk</string>
-    <string name="allergy_eggs">Eggs</string>
-    <string name="allergy_seafood">Seafood</string>
-    <string name="allergy_wheat">Wheat</string>
-    <string name="allergy_soy">Soy</string>
-    <string name="allergy_sesame">Sesame</string>
-    <string name="allergy_other">Other</string>
+    <string name="allergy_peanuts">땅콩</string>
+    <string name="allergy_tree_nuts">견과류</string>
+    <string name="allergy_milk">우유</string>
+    <string name="allergy_eggs">계란</string>
+    <string name="allergy_seafood">해산물</string>
+    <string name="allergy_wheat">밀</string>
+    <string name="allergy_soy">대두</string>
+    <string name="allergy_sesame">참깨</string>
+    <string name="allergy_other">기타</string>
 
     <!-- 확장 시 추가 알레르기 목록 -->
-    <string name="allergy_corn">Corn</string>
-    <string name="allergy_chicken">Chicken</string>
-    <string name="allergy_beef">Beef</string>
-    <string name="allergy_pork">Pork</string>
-    <string name="allergy_tomato">Tomato</string>
-    <string name="allergy_mushroom">Mushroom</string>
-    <string name="allergy_coconut">Coconut</string>
-    <string name="allergy_kiwi">Kiwi</string>
-    <string name="allergy_peach">Peach</string>
-    <string name="allergy_banana">Banana</string>
-    <string name="allergy_garlic">Garlic</string>
-    <string name="allergy_onion">Onion</string>
-    <string name="allergy_spices">Spices</string>
+    <string name="allergy_corn">옥수수</string>
+    <string name="allergy_chicken">닭고기</string>
+    <string name="allergy_beef">소고기</string>
+    <string name="allergy_pork">돼지고기</string>
+    <string name="allergy_tomato">토마토</string>
+    <string name="allergy_mushroom">버섯</string>
+    <string name="allergy_coconut">코코넛</string>
+    <string name="allergy_kiwi">키위</string>
+    <string name="allergy_peach">복숭아</string>
+    <string name="allergy_banana">바나나</string>
+    <string name="allergy_garlic">마늘</string>
+    <string name="allergy_onion">양파</string>
+    <string name="allergy_spices">향신료</string>
 
     <!-- 공통 버튼 및 하단 텍스트 -->
-    <string name="allergy_none">None</string>
-    <string name="btn_complete">Complete</string>
-    <string name="update_settings_msg">You can update this anytime in Settings.</string>
+    <string name="allergy_none">해당 없음</string>
+    <string name="btn_complete">완료</string>
+    <string name="update_settings_msg">설정에서 언제든지 변경할 수 있습니다.</string>
 
-    <string name="welcome_message">Welcome!!</string>
-    <string name="welcome_subtitle">we\'ll recommend personalized food\nand restaurants just for you.</string>
-    <string name="btn_get_started">Get Started</string>
+    <string name="welcome_message">환영합니다!</string>
+    <string name="welcome_subtitle">이제 K-Table과 함께\n나에게 맞는 식당과 메뉴를 찾아보세요.</string>
+    <string name="btn_get_started">시작하기</string>
 </resources>
