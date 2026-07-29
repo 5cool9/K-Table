@@ -13,6 +13,7 @@ import com.example.k_table.databinding.ItemScanResultBinding
 import com.example.k_table.model.MenuScanResult
 import com.example.k_table.model.SuitabilityStatus
 import android.content.Context
+import android.util.Log
 
 class ScanResultAdapter(
     private val onListenClick: (String?) -> Unit
@@ -38,6 +39,7 @@ class ScanResultAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: MenuScanResult, isExpanded: Boolean) {
+            Log.d("PRICE_TEST", "${item.koreanName} / ${item.price}")
             binding.tvKoreanName.text = item.koreanName
             binding.tvEnglishName.text = item.englishName
 

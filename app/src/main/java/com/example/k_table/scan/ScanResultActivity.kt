@@ -91,7 +91,10 @@ class ScanResultActivity : AppCompatActivity() {
             intent.getParcelableArrayListExtra<MenuScanResult>("scanResult")
         }
 
-        scanMenus = result ?: arrayListOf()
+        scanMenus = ArrayList(
+            (result ?: arrayListOf())
+                .distinctBy { it.koreanName }
+        )
 
         fullList = emptyList()
 
@@ -326,14 +329,24 @@ UNSUITABLE
 
                 resultText?.let {
 
-                    val geminiResult =
-                        parseGeminiResult(it)
+                    val geminiResult = parseGeminiResult(it)
+
+                    val mergedResult = geminiResult.map { gemini ->
+
+                        val original = menus.find {
+                            it.koreanName == gemini.koreanName
+                        }
+
+                        gemini.copy(
+                            price = original?.price
+                        )
+                    }
 
                     runOnUiThread {
 
-                        if (geminiResult.isNotEmpty()) {
+                        if (mergedResult.isNotEmpty()) {
 
-                            fullList = geminiResult
+                            fullList = mergedResult
                             updateTabCounts()
                             applyFilter(TabFilter.ALL)
 
