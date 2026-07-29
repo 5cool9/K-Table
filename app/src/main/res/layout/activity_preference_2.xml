@@ -33,11 +33,11 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign Up 2/4"
+            android:layout_marginStart="12dp"
+            android:text="회원가입 2/4"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginStart="12dp" />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- 타이틀 및 설명 영역 -->
@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tell Us About You!"
+            android:text="기본 정보를 입력해 주세요."
             android:textColor="#000000"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -62,10 +62,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="We'll personalize your experience based on your preferences."
+            android:layout_marginTop="8dp"
+            android:text="회원님의 선호도를 바탕으로 맞춤형 서비스를 제공\n합니다."
             android:textColor="#7A7A7A"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- 입력 필드 영역 -->
@@ -83,7 +83,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nickname"
+            android:text="닉네임"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -94,33 +94,36 @@
             android:layout_height="54dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_input_box"
-            android:hint="Enter your nickname"
-            android:textColor="#000000"
-            android:textColorHint="#AAAAAA"
-            android:textSize="16sp"
+            android:hint="닉네임을 입력하세요."
+            android:inputType="text"
+            android:maxLines="1"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:inputType="text"
-            android:maxLines="1" />
+            android:textColor="#000000"
+            android:textColorHint="#AAAAAA"
+            android:textSize="16sp" />
 
         <!-- 언어 선택 라벨 및 드롭다운 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Language"
+            android:layout_marginTop="24dp"
+            android:text="언어"
             android:textColor="#000000"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp" />
+            android:textStyle="bold" />
 
-        <Spinner
-            android:id="@+id/spinnerLanguage"
+        <TextView
+            android:id="@+id/tvLanguage"
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_input_box"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:text="한국어"
+            android:textColor="#000000"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

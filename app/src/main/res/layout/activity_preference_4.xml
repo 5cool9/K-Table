@@ -58,7 +58,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tell Us About You!"
+                android:text="기본 정보를 입력해 주세요."
                 android:textColor="#2D2F34"
                 android:textSize="26sp"
                 android:textStyle="bold" />
