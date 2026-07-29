@@ -1,5 +1,6 @@
 package com.example.k_table.home
 
+import android.content.Intent
 import com.example.k_table.BuildConfig
 import android.os.Bundle
 import android.os.Looper
@@ -39,7 +40,12 @@ import com.google.android.gms.location.Priority
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import android.os.Handler
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import com.example.k_table.SearchRestaurantActivity
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 
 
 data class UserDietProfile(
@@ -61,6 +67,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var viewPagerToday: ViewPager2
     private val autoScrollHandler = Handler(Looper.getMainLooper())
     private var autoScrollRunnable: Runnable? = null
+    private lateinit var etSearch: EditText
 
     private val locationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -77,6 +84,51 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        etSearch = view.findViewById(R.id.etSearch)
+
+        etSearch.setOnEditorActionListener { _, actionId, _ ->
+
+            if(actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+
+                val keyword =
+                    etSearch.text.toString().trim()
+
+                if(keyword.isNotEmpty()) {
+
+                    val intent =
+                        Intent(
+                            requireContext(),
+                            SearchRestaurantActivity::class.java
+                        )
+
+                    intent.putExtra(
+                        "SEARCH_KEYWORD",
+                        keyword
+                    )
+
+                    intent.addFlags(
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    )
+
+                    startActivity(intent)
+                }
+
+                true
+
+            } else {
+                false
+            }
+        }
+
+        val btnLocation = view.findViewById<LinearLayout>(R.id.btnLocation)
+
+        btnLocation.setOnClickListener {
+            requestLocationPermissionAndSearch()
+        }
+
         layoutLoading = view.findViewById(R.id.layoutLoading)
         layoutError = view.findViewById(R.id.layoutError)
 
@@ -89,6 +141,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             LinearLayoutManager(requireContext())
 
         recyclerView.isNestedScrollingEnabled = false
+        recyclerView.itemAnimator = null
 
         adapter = RestaurantAdapter(restaurantList)
 
@@ -195,10 +248,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         autoScrollHandler.postDelayed(autoScrollRunnable!!, 5000)
     }
 
-    // 화면 벗어날 때 자동 슬라이드 타이머 정리 (메모리 누수 방지)
+    // 화면 벗어날 때 자동 슬라이드 타이머 정리
     override fun onDestroyView() {
         super.onDestroyView()
         autoScrollRunnable?.let { autoScrollHandler.removeCallbacks(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (::etSearch.isInitialized) {
+            etSearch.setText("")
+        }
     }
 
     // 위치 버튼 클릭 시 권한 체크 후 분기
@@ -612,15 +673,17 @@ $restaurantData
 
             CoroutineScope(Dispatchers.IO).launch {
 
+                // 5개 이미지를 병렬로 먼저 다 가져온다
+                val imageUrls = newList.map { restaurant ->
+                    async { getRestaurantImageUrl(restaurant.name) }
+                }.awaitAll()
+
                 newList.forEachIndexed { index, restaurant ->
+                    restaurant.imageUrl = imageUrls[index]
+                }
 
-                    val imageUrl = getRestaurantImageUrl(restaurant.name)
-
-                    restaurant.imageUrl = imageUrl
-
-                    withContext(Dispatchers.Main) {
-                        adapter.notifyItemChanged(index)
-                    }
+                withContext(Dispatchers.Main) {
+                    adapter.notifyDataSetChanged()   // 다 모은 뒤 딱 한 번만 갱신
                 }
             }
 

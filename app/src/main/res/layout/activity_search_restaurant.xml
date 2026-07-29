@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="40dp"
+        android:paddingBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"/>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp">
+
+            <EditText
+                android:id="@+id/etSearchResult"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/rounded_edittext"
+                android:paddingStart="16dp"
+                android:paddingEnd="48dp"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"/>
+
+            <ImageView
+                android:id="@+id/ivClearSearch"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="검색어 지우기"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:layout_marginTop="10dp"
+        android:background="#E0E0E0" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="35dp"
+        android:text="검색 결과"
+        android:textColor="#342D2D"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="80dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRestaurantList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"/>
+
+        <LinearLayout
+            android:id="@+id/layoutLoading"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:indeterminateDrawable="@drawable/progress_loading"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="식당 정보를 불러오는 중이에요."
+                android:textColor="#212529"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="사용자의 정보를 기반으로\n추천 식당을 확인 중입니다."
+                android:gravity="center"
+                android:textColor="#7A7A7A"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- 실패 화면 -->
+        <LinearLayout
+            android:id="@+id/layoutError"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+
+            <ImageView
+                android:id="@+id/imgError"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:src="@drawable/error_image"
+                android:scaleType="fitCenter"/>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="추천 식당 정보를 불러오지 못했어요."
+                android:textColor="#212529"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="네트워크 응답이 없거나 일시적인 오류가 발생했어요.\n잠시 후 다시 시도해주세요."
+                android:gravity="center"
+                android:textColor="#7A7A7A"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+</LinearLayout>
