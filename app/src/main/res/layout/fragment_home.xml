@@ -47,17 +47,21 @@
 
                 <!-- 검색창 -->
                 <EditText
+                    android:id="@+id/etSearch"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_edittext"
-                    android:hint="메뉴를 검색해보세요 !"
+                    android:hint="찾고 싶은 지역을 검색해보세요!"
                     android:paddingHorizontal="16dp"
                     android:textColorHint="#BBBBBB"
                     android:textColor="#111111"
                     android:textSize="13sp"
                     android:drawableStart="@drawable/ic_menu_search"
-                    android:drawablePadding="8dp"/>
+                    android:drawablePadding="8dp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:singleLine="true"/>
 
                 <!-- 위치 버튼 -->
                 <LinearLayout

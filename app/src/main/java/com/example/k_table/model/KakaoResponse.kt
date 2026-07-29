@@ -12,3 +12,13 @@ data class KakaoPlace(
     val phone: String,
     val distance: String,
 )
+
+data class KakaoAddressResponse(
+    val documents: List<KakaoAddress>
+)
+
+data class KakaoAddress(
+    val x: String,
+    val y: String,
+    val address_name: String
+)
